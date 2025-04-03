@@ -1,0 +1,30 @@
+metadata:
+  version:      "1.0"
+  description:  "Schema for api_keys.yaml"
+  override_defaults:
+    nullable: false
+  templates:
+    field:
+      level:      0
+      format:     str
+      validator:  "^[a-zA-Z0-9_-]+$"
+    key:
+      level:  1
+      format: Dict
+      element_defaults:
+        format: field
+      elements:
+        - name:     {}
+        - service:  {}
+        - username: {}
+        - description:
+            nullable: true
+    keys:
+      level:          2
+      format:         List
+      element_format: key
+      validator:      [1..inf]
+
+schema:
+  api_keys:
+    template: keys

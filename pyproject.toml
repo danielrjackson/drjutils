@@ -1,0 +1,26 @@
+[tool.poetry]
+    name            = "DRJ-Utils"
+    version         = "0.1.0"
+    description     = "Common utilities shared across my projects"
+    license         = "CC BY-NC-ND 4.0"
+    readme          = "README.md"
+    authors         = ["Daniel Jackson <daniel.r.jackson@gmail.com>"]
+    package-mode    = false
+
+[tool.poetry.dependencies]
+    python  = "^3.13"   # Newest version of python
+    keyring = "^25.6.0" # Access API Keys from system credential manager
+    pyyaml  = "^6.0.2"  # Read YAML files
+    sympy   = "^1.13.3" # Handle certain mathematical types
+
+[tool.poetry.group.dev.dependencies]
+    coverage    = "^7.7.1"      # Test coverage report
+    hypothesis  = "^6.130.4"    # Fuzzy testing
+    pytest      = "^7.4.4"      # Testing library
+
+[tool.pytest.ini_options]
+    pythonpath = ["src"]
+
+[build-system]
+    requires        = ["poetry-core^2.0.0"]
+    build-backend   = "poetry.core.masonry.api"

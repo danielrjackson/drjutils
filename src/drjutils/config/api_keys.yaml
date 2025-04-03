@@ -1,0 +1,18 @@
+# API Keys
+# Stored in securely Windows Credential Manager
+api_keys:
+  - name:         OpenAI_DevKey
+    service:      OpenAI_API
+    username:     My_Dev_Key
+    description:  My OpenAI API Key for development purposes
+
+# Examples of additional keys
+  #- name:         AnthropicClaude
+  #  service:      Anthropic_API
+  #  username:     Claude_Key
+  #  description:  My Anthropic API Key for Claude
+  
+  #- name:         GithubToken
+  #  service:      Github
+  #  username:     Personal_Access_Token
+  #  description:  My Github Personal Access Token
