@@ -1,26 +1,30 @@
-[tool.poetry]
-    name            = "DRJ-Utils"
-    version         = "0.1.0"
-    description     = "Common utilities shared across my projects"
-    license         = "CC BY-NC-ND 4.0"
-    readme          = "README.md"
-    authors         = ["Daniel Jackson <daniel.r.jackson@gmail.com>"]
-    package-mode    = false
+[project]
+name = "DRJ-Utils"
+version = "0.1.0"
+description = "Common utilities shared across my projects"
+authors = [{ name = "Daniel Jackson", email = "daniel.r.jackson@gmail.com" }]
+requires-python = "~=3.13"
+readme = "README.md"
+license = "CC BY-NC-ND 4.0"
+dependencies = [
+    "keyring>=25.6.0,<26",
+    "pyyaml>=6.0.2,<7",
+    "sympy>=1.13.3,<2",
+]
 
-[tool.poetry.dependencies]
-    python  = "^3.13"   # Newest version of python
-    keyring = "^25.6.0" # Access API Keys from system credential manager
-    pyyaml  = "^6.0.2"  # Read YAML files
-    sympy   = "^1.13.3" # Handle certain mathematical types
+[dependency-groups]
+dev = [
+    "coverage>=7.7.1,<8",
+    "hypothesis>=6.130.4,<7",
+    "pytest>=7.4.4,<8",
+]
 
-[tool.poetry.group.dev.dependencies]
-    coverage    = "^7.7.1"      # Test coverage report
-    hypothesis  = "^6.130.4"    # Fuzzy testing
-    pytest      = "^7.4.4"      # Testing library
+[tool.uv]
+package = false
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
     pythonpath = ["src"]
-
-[build-system]
-    requires        = ["poetry-core^2.0.0"]
-    build-backend   = "poetry.core.masonry.api"
