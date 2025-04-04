@@ -125,14 +125,14 @@ making the Licensed Material available under these terms and conditions.
      <li> <a id="2a1"></a>Subject to the terms and conditions of this Public License, the Licensor
           hereby grants You a worldwide, royalty-free, non-sublicensable, non-exclusive, irrevocable
           license to exercise the Licensed Rights in the Licensed Material to:
-          <ol type="A">
-          <li> reproduce and Share the Licensed Material, in whole or in part, for NonCommercial
-               purposes only; and
-          </li>
-          <li> produce and reproduce, but not Share, Adapted Material for NonCommercial purposes
-               only.
-          </li>
-          </ol>
+          <div style="padding-left: 1.6em; text-indent: -1.4em;">
+          A. &nbsp;reproduce and Share the Licensed Material, in whole or in part, for NonCommercial
+             purposes only; and
+          </div>
+          <div style="padding-left: 1.6em; text-indent: -1.4em;">
+          B. &nbsp;produce and reproduce, but not Share, Adapted Material for NonCommercial purposes
+             only.
+          </div>
      </li>
      <li> <b>Exceptions and Limitations.</b> For the avoidance of doubt, where Exceptions and
           Limitations apply to Your use, this Public License does not apply, and You do not need to
@@ -151,17 +151,17 @@ making the Licensed Material available under these terms and conditions.
           <a href="#2a4">2(a)(4)</a> never produces Adapted Material.
      </li>
      <li> <u>Downstream recipients.</u>
-          <ol type="A">
-          <li> <u>Offer from the Licensor</u> – Licensed Material. Every recipient of the Licensed
-               Material automatically receives an offer from the Licensor to exercise the Licensed
-               Rights under the terms and conditions of this Public License.
-          </li>
-          <li> <u>No downstream restrictions.</u> You may not offer or impose any additional or
-               different terms or conditions on, or apply any Effective Technological Measures to,
-               the Licensed Material if doing so restricts exercise of the Licensed Rights by any
-               recipient of the Licensed Material.
-          </li>
-          </ol>
+          <div style="padding-left: 1.6em; text-indent: -1.4em;">
+          A. &nbsp;<u>Offer from the Licensor</u> – Licensed Material. Every recipient of the
+             Licensed Material automatically receives an offer from the Licensor to exercise the
+             Licensed Rights under the terms and conditions of this Public License.
+          </div>
+          <div style="padding-left: 1.6em; text-indent: -1.4em;">
+          B. &nbsp;<u>No downstream restrictions.</u> You may not offer or impose any additional or
+             different terms or conditions on, or apply any Effective Technological Measures to, the
+             Licensed Material if doing so restricts exercise of the Licensed Rights by any
+             recipient of the Licensed Material.
+          </div>
      </li>
      <li> <u>No endorsement.</u> Nothing in this Public License constitutes or may be construed as
           permission to assert or imply that You are, or that Your use of the Licensed Material is,
@@ -198,30 +198,37 @@ Your exercise of the Licensed Rights is expressly made subject to the following 
 <ol type="a">
 <li> <a id="3a"></a><b>Attribution.</b>
      <ol type="1">
-     <li> <a id="3a1"></a>If You Share the Licensed Material, You must:
-          <ol type="A">
-          <li> <a id="3a1A"></a>retain the following if it is supplied by the Licensor with the
-               Licensed Material:
-               <ol type="i">
-               <li> <a id="3a1Ai"></a>identification of the creator(s) of the Licensed Material and
-                    any others designated to receive attribution, in any reasonable manner requested
-                    by the Licensor (including by pseudonym if designated);
-               </li>
-               <li> a copyright notice;</li>
-               <li> a notice that refers to this Public License;</li>
-               <li> a notice that refers to the disclaimer of warranties;</li>
-               <li> a URI or hyperlink to the Licensed Material to the extent reasonably
-                    practicable;
-               </li>
-               </ol>
-          </li>
-          <li> indicate if You modified the Licensed Material and retain an indication of any
-               previous modifications; and
-          </li>
-          <li> indicate the Licensed Material is licensed under this Public License, and include the
-               text of, or the URI or hyperlink to, this Public License.
-          </li>
-          </ol>
+     <li> <a id="3a1"></a>If You Share the Licensed Material, You must:<br/>
+          <div id="3a1A" style="padding-left: 1.6em; text-indent: -1.4em;">
+          A. &nbsp;retain the following if it is supplied by the Licensor with the Licensed
+             Material:
+               <div id="3a1Ai" style="padding-left: 1.6em; text-indent: -1.4em;">
+               i. &nbsp;&nbsp;identification of the creator(s) of the Licensed Material and any
+                  others designated to receive attribution, in any reasonable manner requested by
+                  the Licensor (including by pseudonym if designated);
+               </div>
+               <div style="padding-left: 1.6em; text-indent: -1.4em;">
+               ii. &nbsp;a copyright notice;
+               </div>
+               <div style="padding-left: 1.6em; text-indent: -1.4em;">
+               iii. a notice that refers to this Public License;
+               </div>
+               <div style="padding-left: 1.6em; text-indent: -1.4em;">
+               iv. a notice that refers to the disclaimer of warranties;
+               </div>
+               <div style="padding-left: 1.6em; text-indent: -1.4em;">
+               v. &nbsp;a URI or hyperlink to the Licensed Material to the extent reasonably
+                  practicable;
+               </div>
+          </div>
+          <div style="padding-left: 1.6em; text-indent: -1.4em;">
+          B. &nbsp;&nbsp;indicate if You modified the Licensed Material and retain an indication of
+             any previous modifications; and
+          </div>
+          <div style="padding-left: 1.6em; text-indent: -1.4em;">
+          C. &nbsp;&nbsp;indicate the Licensed Material is licensed under this Public License, and
+             include the text of, or the URI or hyperlink to, this Public License.
+          </div>
           For the avoidance of doubt, You do not have permission under this Public License to Share
           Adapted Material.
      </li>
