@@ -18,7 +18,7 @@ Add this repository as a submodule to your project:
 
 ```bash
 # Add the submodule to a 'libs' directory in your project
-git submodule add https://github.com/yourusername/drjutils.git libs/drjutils
+git submodule add https://github.com/danielrjackson/drjutils.git libs/drjutils
 ```
 
 ### Usage
@@ -61,6 +61,15 @@ debug("Processing data", include_location=True)  # Shows file and line number
 - **Path Management**: Discover project roots, manage common directory structures
 - **Time Formatting**: Format time deltas and timestamps
 
-## License
+---
 
-Copyright 2025 Daniel Robert Jackson
+*Copyright © 2025 Daniel Jackson. Licensed under [CC BY-NC-ND 4.0].*
+
+![LicenseImage]
+
+*Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International* [Official CC License]
+
+[//]: # (Links)
+[CC BY-NC-ND 4.0]:          LICENSE
+[LicenseImage]:             docs/images/license.png
+[Official CC License]:      https://creativecommons.org/licenses/by-nc-nd/4.0/

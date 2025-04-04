@@ -2,16 +2,20 @@
     name            = "DRJ-Utils"
     version         = "0.1.0"
     description     = "Common utilities shared across my projects"
-    authors         = [{name = "Daniel Jackson", email = "daniel.r.jackson@gmail.com"}]
+    authors         = [{ name = "Daniel Jackson", email = "643707+danielrjackson@users.noreply.github.com" }]
     requires-python = "~=3.13"  # Newest version of python
-    readme          = "README.md"
-    license         = "CC BY-NC-ND 4.0"
-    dependencies = [
+    readme          = { file = "README.md", content-type = "text/markdown" }
+    license         = { file = "LICENSE.md" }
+    dependencies    = [
         "keyring>=25.6.0,<26",  # Access API Keys from system credential manager
         "mcp[cli]>=1.6.0",      # Model Context Protocol CLI interface
         "pyyaml>=6.0.2,<7",     # Read YAML files
         "sympy>=1.13.3,<2",     # Handle certain mathematical types
     ]
+
+[build-system]
+    requires        = ["hatchling"]
+    build-backend   = "hatchling.build"
 
 [dependency-groups]
     dev = [
@@ -20,12 +24,8 @@
         "pytest>=7.4.4,<8",         # Python testing library
     ]
 
-[tool.uv]
-    package = false
-
-[build-system]
-    requires        = ["hatchling"]
-    build-backend   = "hatchling.build"
-
 [tool.pytest.ini_options]
     pythonpath = ["src"]
+
+[tool.uv]
+    package = false
