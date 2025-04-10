@@ -10,6 +10,6 @@ WORKDIR /app
 COPY . .
 
 # Upgrade pip and install your project dependencies including mcp[cli]
-RUN pip install --upgrade pip && pip install .
+RUN pip install --upgrade pip && pip install -e ".[dev]"
 
 # Optionally, specify a default command (often left for VS Code to manage in dev containers)
