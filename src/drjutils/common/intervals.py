@@ -20,7 +20,7 @@ from sympy import Interval
 """
 Internal Libraries
 """
-from .numbers import format_number, num_rgx_str, strct_num_rgx_str, to_number
+from .numbers import format_number, num_rgx_str, strct_num_rgx_str, to_number, trl_dec_req_rgx_str, led_dec_req_rgx_str
 
 __all__ = [
     "check_interval_str_match",
@@ -35,18 +35,18 @@ __all__ = [
     "is_std_interval_str",
     "std_interval_rgx",
     "std_interval_rgx_str",
-    "to_interval"
+    "to_interval",
     "to_std_interval_str"
 ]
 
 # Matches interval strings (permissive formatting)
-# e.g. "[ 1 .. 2 ]", "(1 .. 2)", "[1..2)", "(1..2]", "1..2", "1e-5..2e+5", "-1e-5...2e+5", etc.
+# e.g. "[ 1 .. 2 ]", "(1 .. 2)", "[1..2)", "(1..2]", "1..2", "1e-5..2e+5", etc.
 # Note that in this regex, we can't allow a trailing decimal after the minimum value, or a leading decimal before the maximum value
 # because it would be ambiguous with the ellipsis separator. (unless there are spaces between the numbers and the ellipsis)
 _core_interval_rgx_str = rf"""
-        ({num_rgx_str}) # minimum number
+        ({trl_dec_req_rgx_str}) # minimum number
         \s*\.\.\s*      # ellipsis separator
-        ({num_rgx_str}) # maximum number
+        ({led_dec_req_rgx_str}) # maximum number
     """
 
 interval_rgx_str = rf"""
@@ -87,8 +87,18 @@ def check_interval_str_match(interval: str) -> Match:
     if match is None:
         raise ValueError(f"Invalid interval format: {interval}")
     
+    # Extract the groups correctly
+    groups = match.groups()
+    
+    # The pattern can match with or without brackets, handle both cases
+    if groups[0] is not None:  # Has brackets
+        # groups[0] = left bracket, groups[1] = min_val, groups[2] = max_val, groups[3] = right bracket
+        min_val, max_val = groups[1], groups[2]
+    else:  # No brackets
+        # groups[4] = min_val, groups[5] = max_val
+        min_val, max_val = groups[4], groups[5]
+    
     # Check that the minimum value is less than or equal to the maximum value
-    min_val, max_val = match.groups()[1:3]
     if to_number(min_val) > to_number(max_val):
         raise ValueError(f"Minimum value is greater than maximum value: {interval}")
     
@@ -111,8 +121,12 @@ def check_std_interval_str_match(interval: str) -> Match:
     if match is None:
         raise ValueError(f"Invalid standard interval format: {interval}")
     
+    # For the standard interval regex, the groups are always in the same order:
+    # groups[0] = full match, groups[1] = left bracket, groups[2] = min_val, groups[3] = max_val, groups[4] = right bracket
+    groups = match.groups()
+    min_val, max_val = groups[1], groups[2]
+    
     # Check that the minimum value is less than or equal to the maximum value
-    min_val, max_val = match.groups()[1:3]
     if to_number(min_val) > to_number(max_val):
         raise ValueError(f"Minimum value is greater than maximum value: {interval}")
     
@@ -151,9 +165,10 @@ def format_interval(interval: Interval) -> str:
         ValueError: If the interval is None.
     """
     assert interval is not None, "Interval cannot be None"
-        
-    left_bracket = "[" if interval.left_open else "("
-    right_bracket = "]" if interval.right_open else ")"
+    
+    # Square brackets [] mean inclusive, parentheses () mean exclusive
+    left_bracket = "(" if interval.left_open else "["
+    right_bracket = ")" if interval.right_open else "]"
     return f"{left_bracket}{format_number(interval.start)} .. {format_number(interval.end)}{right_bracket}"
 
 def is_float_interval(interval: Interval) -> bool:
@@ -166,7 +181,7 @@ def is_float_interval(interval: Interval) -> bool:
     Returns:
         bool: True if the interval contains only floats, False otherwise.
     """
-    return isinstance(interval.start, float)
+    return not(is_int_interval(interval))
 
 def is_int_interval(interval: Interval) -> bool:
     """
@@ -178,6 +193,9 @@ def is_int_interval(interval: Interval) -> bool:
     Returns:
         bool: True if the interval contains only integers, False otherwise.
     """
+    # Note: Both the start and end of the interval will be of the same type.
+    # This means we don't have to check both start and end.
+    # Additionally, we only care about type, not value. So 1.0 is not an int.
     return isinstance(interval.start, int)
 
 def is_interval_str(interval: str) -> bool:
@@ -260,24 +278,40 @@ def to_std_interval_str(interval: str) -> str:
         ValueError: If the interval string is not in a valid format.
     """
     # Check if matches regex
-    check_interval_str_match(interval)
+    match = check_interval_str_match(interval)
     
     # Check if already in standard format
     if is_std_interval_str(interval):
         return interval
     
-    # Remove extra spaces and ellipsis and convert to lowercase
-    interval = interval.lower().replace(" ", "").replace("..", " .. ")
-    # Remove plus signs except for scientific notation
-    interval.replace("e+", "e_").replace("+", "").replace("e_", "e+")
-    # add brackets if missing
-    if interval[0] not in "([":
-        interval = f"[{interval}]"
+    # Extract the components of the interval
+    groups = match.groups()
+    
+    # The pattern can match with or without brackets, handle both cases
+    if groups[0] is not None:  # Has brackets
+        # groups[0] = left bracket, groups[1] = min_val, groups[2] = max_val, groups[3] = right bracket
+        left_bracket = groups[0]
+        min_val = groups[1]
+        max_val = groups[2]
+        right_bracket = groups[3]
+    else:  # No brackets
+        # groups[4] = min_val, groups[5] = max_val
+        left_bracket = "["
+        min_val = groups[4]
+        max_val = groups[5]
+        right_bracket = "]"
+    
+    # Format the numbers to ensure they're properly represented
+    min_val_formatted = format_number(to_number(min_val))
+    max_val_formatted = format_number(to_number(max_val))
+    
+    # Construct the standardized interval string
+    std_interval = f"{left_bracket}{min_val_formatted} .. {max_val_formatted}{right_bracket}"
     
     # Sanity check that it's now in standard format
-    check_std_interval_str_match(interval)
+    check_std_interval_str_match(std_interval)
     
-    return interval
+    return std_interval
 
 # Override the __str__ method for the Interval class
 Interval.__str__ = lambda self: format_interval(self)
