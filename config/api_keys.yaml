@@ -4,3 +4,6 @@ keys:
   - name: OpenAI_DevKey
     url: OpenAI_API
     username: My_Dev_Key
+  - name: Anthropic_DevKey
+    url: Anthropic_API
+    username: My-Claude-API-Key
