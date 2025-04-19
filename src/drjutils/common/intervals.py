@@ -20,7 +20,7 @@ from sympy import Interval
 """
 Internal Libraries
 """
-from .numbers import format_number, num_rgx_str, strct_num_rgx_str, to_number, trl_dec_req_rgx_str, led_dec_req_rgx_str
+from .numbers import format_number, num_opl_rgx_str, num_opt_rgx_str, num_sct_rgx_str, num_rlx_rgx_str, to_number
 
 __all__ = [
     "check_interval_str_match",
@@ -38,37 +38,106 @@ __all__ = [
     "to_interval",
     "to_std_interval_str"
 ]
+_invl_rlx_spc_rgx_str = rf"({num_opl_rgx_str})\.\.({num_opt_rgx_str})"
+_invl_sct_spc_rgx_str = rf"({num_rlx_rgx_str})\s+\.\.\s+({num_rlx_rgx_str})"
+interval_rgx_str = rf"([\[(])?\s*(?:{_invl_rlx_spc_rgx_str}|{_invl_sct_spc_rgx_str})\s*([\])])?"
+r"""
+# String that can be used as a regex that matches interval strings (permissive formatting)
+* Note that in this regex:
+    *   we can't allow a trailing decimal after the minimum value,
+    *   or a leading decimal before the maximum value
+    *   unless there are spaces between the numbers and the ellipsis
+    *   because it would be ambiguous with the ellipsis separator.
+*   Pattern:
+    *   0:  ([\[(])?
+        *   Optional left bracket or parenthesis ('[':inclusive|'(':exclusive)
+    *   \s*(?:          (not captured)
+    *   If no spaces around the ellipsis
+        *   1:  ([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)
+            *   Minimum value (can be float or int)
+            *   Cannot end with a decimal (e.g. "1." is not valid)
+        *   \.\.        (not captured)
+        *   2:  ([+-]?\\d+\\.?\\d*(?:[eE][+-]?\\d+)?)    
+            *   Maximum value (can be float or int)
+            *   Cannot start with a decimal (e.g. ".2" is not valid)
+    *   If spaces around the ellipsis
+        *   3:  ([+-]?(?:\\d*\\.?\\d+|\\d+\\.\\d*)(?:[eE][+-]?\\d+)?)
+            *   Minimum value (can be float or int)
+            *   Any valid number works here (e.g. "1.", ".2", "1e-5", etc.)
+        *   \s+\.\.\s+  (not captured)
+        *   4:  ([+-]?(?:\\d*\\.?\\d+|\\d+\\.\\d*)(?:[eE][+-]?\\d+)?)
+            *   Maximum value (can be float or int)
+            *   Any valid number works here (e.g. "1.", ".2", "1e-5", etc.)
+    *   )\s*            (not captured)
+    *   5:  ([\])])?
+        *   Optional right bracket or parenthesis (']':inclusive|')':exclusive)
+*   e.g.:   "[ 1 .. 2 ]", "(1 .. 2)", "[1..2)", "(1..2]", "1..2", "1e-5..2e+5", etc.
+"""
 
-# Matches interval strings (permissive formatting)
-# e.g. "[ 1 .. 2 ]", "(1 .. 2)", "[1..2)", "(1..2]", "1..2", "1e-5..2e+5", etc.
-# Note that in this regex, we can't allow a trailing decimal after the minimum value, or a leading decimal before the maximum value
-# because it would be ambiguous with the ellipsis separator. (unless there are spaces between the numbers and the ellipsis)
-_core_interval_rgx_str = rf"""
-        ({trl_dec_req_rgx_str}) # minimum number
-        \s*\.\.\s*      # ellipsis separator
-        ({led_dec_req_rgx_str}) # maximum number
-    """
+interval_rgx = compile(f"^\s*{interval_rgx_str}\s*$")
+r"""
+# Regex pattern that matches interval strings (permissive formatting)
+* Note that in this regex:
+    *   we can't allow a trailing decimal after the minimum value,
+    *   or a leading decimal before the maximum value
+    *   unless there are spaces between the numbers and the ellipsis
+    *   because it would be ambiguous with the ellipsis separator.
+*   Pattern:
+    *   ^\s*            (not captured)
+    *   0:  ([\[(])?
+        *   Optional left bracket or parenthesis ('[':inclusive|'(':exclusive)
+    *   \s*(?:          (not captured)
+    *   If no spaces around the ellipsis
+        *   1:  ([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)
+            *   Minimum value (can be float or int)
+            *   Cannot end with a decimal (e.g. "1." is not valid)
+        *   \.\.        (not captured)
+        *   2:  ([+-]?\\d+\\.?\\d*(?:[eE][+-]?\\d+)?)    
+            *   Maximum value (can be float or int)
+            *   Cannot start with a decimal (e.g. ".2" is not valid)
+    *   If spaces around the ellipsis
+        *   3:  ([+-]?(?:\\d*\\.?\\d+|\\d+\\.\\d*)(?:[eE][+-]?\\d+)?)
+            *   Minimum value (can be float or int)
+            *   Any valid number works here (e.g. "1.", ".2", "1e-5", etc.)
+        *   \s+\.\.\s+  (not captured)
+        *   4:  ([+-]?(?:\\d*\\.?\\d+|\\d+\\.\\d*)(?:[eE][+-]?\\d+)?)
+            *   Maximum value (can be float or int)
+            *   Any valid number works here (e.g. "1.", ".2", "1e-5", etc.)
+    *   )\s*            (not captured)
+    *   5:  ([\])])?
+        *   Optional right bracket or parenthesis (']':inclusive|')':exclusive)
+    *   \s*$            (not captured)
+*   e.g.:   "[ 1 .. 2 ]", "(1 .. 2)", "[1..2)", "(1..2]", "1..2", "1e-5..2e+5", etc.
+"""
 
-interval_rgx_str = rf"""
-        (?:
-            ([\[(])\s*                  # opening bracket
-            {_core_interval_rgx_str}    # minimum and maximum numbers
-            \s*([\])])                  # closing bracket
-            |{_core_interval_rgx_str}   # minimum and maximum numbers without brackets
-        )
-    """
-interval_rgx = compile(f"^\s*{interval_rgx_str}\s*$", VERBOSE)
 
 # Matches standard interval strings
 # e.g. "[1 .. 2]", "(1 .. 2)", "[1 .. 2)", "(1 .. 2]", "[-1.5 .. 3.5]", "[-1.5 .. 3.5)", "(-1.5 .. 3.5]", "(-1.5 .. 3.5)", [1.5e-5 .. 2e+5], "(1e-5 .. 2e+5)", "[1e-5 .. 2e+5)", "(-1e-5 .. 2e+5]"
-std_interval_rgx_str = rf"""
-        ([\[(])                 # opening bracket
-        ({strct_num_rgx_str})   # minimum number
-        \ \.\.\                 # ellipsis separator
-        ({strct_num_rgx_str})   # maximum number
-        ([\])])                 # closing bracket
-    """
-std_interval_rgx = compile(f"^{std_interval_rgx_str}$", VERBOSE)
+std_interval_rgx_str = rf"([\[(])({num_sct_rgx_str})\ \.\.\ ({num_sct_rgx_str})([\])])"
+r"""
+# String that can be used as a regex that matches standard interval strings (strict formatting)
+*   All numbers must be in standard format (e.g. "1", "2.0", "1.0e-10", etc.)
+*   The ellipsis must be surrounded by a single space on each side.
+*   The brackets/parentheses must be present.
+*   Pattern:
+    *   0:  ([\[(])
+        *   Left bracket or parenthesis ('[':inclusive|'(':exclusive)
+    *   1:  ([+-]?(?:\\d*\\.?\\d+|\\d+\\.\\d*)(?:[eE][+-]?\\d+)?)
+        *   Minimum value (can be float or int)
+    *   \ \.\.\     (not captured)
+        *   Ellipsis (must be surrounded by a single space on each side)
+        *   ' .. '
+    *   2:  ([+-]?(?:\\d*\\.?\\d+|\\d+\\.\\d*)(?:[eE][+-]?\\d+)?)
+        *   Maximum value (can be float or int)
+    *   3:  ([\])])
+        *   Right bracket or parenthesis (']':inclusive|')':exclusive)
+*   e.g.:
+    *   "[1 .. 2]", "(1 .. 2)", "[1 .. 2)", "(1 .. 2]",
+    *   "[-1.5 .. 3.5]", "[-1.5 .. 3.5)", "(-1.5 .. 3.5]", "(-1.5 .. 3.5)",
+    *   [1.5e-10 .. 2.0e+10], "(1e-10 .. 2e+10)", "[1e-10)", "[1e-10 .. 2e+10)", "(-1e-10 .. 2e+10]"
+"""
+
+std_interval_rgx = compile(f"^{std_interval_rgx_str}$")
 
 def check_interval_str_match(interval: str) -> Match:
     """

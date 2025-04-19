@@ -5,7 +5,6 @@ Copyright 2025 Daniel Robert Jackson
 """
 
 # Test Libraries
-import hypothesis.strategies as st
 import pytest
 
 # External Libraries
@@ -22,7 +21,7 @@ std_int_intervals = [
     "(1 .. 2]",
     "[-1 .. 0]",
     "(-1 .. 0)",
-    "[-1 .. 1]",
+    "[-1 .. 1]"
 ]
 
 valid_int_intervals = std_int_intervals + [
@@ -30,13 +29,18 @@ valid_int_intervals = std_int_intervals + [
     "(1..2)",
     "[1..2)",
     "(1..2]",
+    "[1 .. 2] ",
+    " (1 .. 2)",
     "[1 .. 2 ]",
     "[ 1 ..2 )",
     "( 1.. 2 ]",
     "( 1 .. 2 )",
     "(   1  ..  2  )",
     "1..2",
-    "1 .. 2"
+    "1 .. 2",
+    " 1..2",
+    "1..2 ",
+    "  1   ..  2    "
 ]
 
 std_float_intervals = [
@@ -44,10 +48,10 @@ std_float_intervals = [
     "(0.5 .. 3.5)",
     "[0.5 .. 3.5)",
     "(0.5 .. 3.5]",
-    "[1e-5 .. 2.0e+5]",
-    "(1e-5 .. 2.0e+5)",
-    "[1e-5 .. 2.0e+5)",
-    "(1e-5 .. 2.0e+5]",
+    "[1.0e-5 .. 2.0e+5]",
+    "(1.0e-5 .. 2.0e+5)",
+    "[1.0e-5 .. 2.0e+5)",
+    "(1.0e-5 .. 2.0e+5]"
 ]
 
 valid_float_intervals = std_float_intervals + [
@@ -63,16 +67,20 @@ valid_float_intervals = std_float_intervals + [
     "( 1e-5 .. 2e+5 )",
     "[ 1e-5 .. 2e+5 )",
     "( 1e-5 .. 2e+5 ]",
+    " [-1.5 .. 3.5]",
+    "[-1.5 .. 3.5) ",
     "1e-5..2e+5",
     "1e-5 .. 2e+5",
-    "1e-5  ..  2e+5"
+    "1e-5  ..  2e+5",
+    " 1e-5..2e+5",
+    "1e-5..2e+5 ",
+    "   1e-5  .. 2e+5  "
 ]
 
+std_intervals = std_int_intervals + std_float_intervals
 valid_intervals = valid_int_intervals + valid_float_intervals
 
 invalid_intervals = [
-    "[1 .. 2] ",
-    " (1 .. 2)",
     "[2 .. 1]",
     "(2 .. 1)",
     "[2 .. 1)",
@@ -83,9 +91,6 @@ invalid_intervals = [
     "-1.5",
     "1..",
     "1...",
-    "[ 1...2 )",
-    " (1...2] ",
-    "1...2",
     ".2",
     "..2",
     "...2",
@@ -103,6 +108,9 @@ invalid_intervals = [
     "1...2]",
     "1...2)",    
     "[1...2]",
+    "[ 1...2 )",
+    " (1...2] ",
+    "1...2",
     "[-1.5 ...3.5]",
     "1e-5...2e+5",
     " 1e-5 ... 2e+5 ",
@@ -133,7 +141,7 @@ def test_check_interval_str_match_invalid(interval_str):
     with pytest.raises(ValueError):
         check_interval_str_match(interval_str)
 
-@pytest.mark.parametrize("interval_str", valid_intervals)
+@pytest.mark.parametrize("interval_str", std_intervals)
 def test_check_std_interval_str_match_valid(interval_str):
     assert check_std_interval_str_match(interval_str) is not None
 
@@ -145,7 +153,7 @@ def test_check_std_interval_str_match_invalid(interval_str):
 @pytest.mark.parametrize("interval_str", valid_intervals)
 def test_check_valid_interval_values_valid(interval_str):
     match = check_interval_str_match(interval_str)
-    min_val, max_val = match.groups()[2:3]
+    min_val, max_val = match.groups()[1:3]
     assert check_valid_interval_values(min_val, max_val)    
 
 @pytest.mark.parametrize("interval_str", valid_intervals)

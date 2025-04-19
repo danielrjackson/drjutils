@@ -7,3 +7,6 @@ keys:
   - name: Anthropic_DevKey
     url: Anthropic_API
     username: My-Claude-API-Key
+  - name: Google_DevKey
+    url: Google_API
+    username: Generative Language API Key
