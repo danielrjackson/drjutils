@@ -7,11 +7,12 @@
     readme          = { file = "README.md", content-type = "text/markdown" }
     license         = { file = "LICENSE.md" }
     dependencies    = [
+        "intvalpy>=1.6.5,<2",   # Integer arithmetic in Python
         "keyring>=25.6.0,<26",  # Access API Keys from system credential manager
-        "mcp[cli]>=1.6.0",      # Model Context Protocol CLI interface
+        "mcp[cli]>=1.6.0,<2",   # Model Context Protocol CLI interface
+#        "numpy>=2.2.5,<3",      # Numerical Computing
         "pyyaml>=6.0.2,<7",     # Read YAML files
-        "sympy>=1.13.3,<2",     # Handle certain mathematical types
-    ]
+]
 
 [build-system]
     requires        = ["hatchling"]

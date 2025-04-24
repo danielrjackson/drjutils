@@ -6,9 +6,17 @@ This module provides common utility functions for path management, string format
 Copyright 2025 Daniel Robert Jackson
 """
 
-from .intervals import check_interval_str_match, check_std_interval_str_match, check_valid_interval_values, format_interval, interval_rgx, interval_rgx_str, is_float_interval, is_int_interval, is_interval_str, is_std_interval_str, std_interval_rgx, std_interval_rgx_str, to_interval, to_std_interval_str
+from .intervals import check_interval_str_match, check_std_interval_str_match, check_valid_interval_values
+from .intervals import format_interval, to_interval, to_std_interval_str
+from .intervals import is_float_interval, is_int_interval, is_interval_str, is_std_interval_str
+from .intervals import interval_rgx_str, interval_rgx, std_interval_rgx_str, std_interval_rgx
 from .paths     import BaseProjectPaths
-from .numbers   import flt_bsc_opl_rgx_str, flt_bsc_opl_rgx, flt_bsc_opt_rgx_str, flt_bsc_opt_rgx, flt_bsc_rgx_str, flt_bsc_rgx, flt_bsc_rlx_rgx_str, flt_bsc_rlx_rgx, flt_bsc_sct_rgx_str, flt_bsc_sct_rgx, flt_rgx_str, flt_rgx, flt_rlx_rgx_str, flt_rlx_rgx, flt_sct_rgx_str, flt_sct_rgx, format_number, int_rgx_str, int_rgx, int_sct_rgx_str, int_sct_rgx, is_float, is_int, is_number, num_bsc_opl_rgx_str, num_bsc_opl_rgx, num_bsc_opt_rgx_str, num_bsc_opt_rgx, num_bsc_rgx_str, num_bsc_rgx, num_bsc_rlx_rgx_str, num_bsc_rlx_rgx, num_bsc_sct_rgx_str, num_bsc_sct_rgx, num_opl_rgx_str, num_opl_rgx, num_opt_rgx_str, num_opt_rgx, num_rgx_str, num_rgx, num_rlx_rgx_str, num_rlx_rgx, num_sct_rgx_str, num_sct_rgx, sci_rgx_str, sci_rgx, sci_rlx_rgx_str, sci_rlx_rgx, sci_sct_rgx_str, sci_sct_rgx, sgn_opt_rgx_str, sgn_req_rgx_str, to_number
+from .numbers   import format_number, to_number
+from .numbers   import is_basic_float, is_basic_int, is_float, is_int, is_non_decimal, is_number, is_scinot
+from .numbers   import flt_bsc_rgx_str, flt_bsc_rgx, flt_rgx_str, flt_rgx
+from .numbers   import int_bas_rgx_str, int_bas_rgx, int_bsc_rgx_str, int_bsc_rgx, int_rgx_str, int_rgx
+from .numbers   import num_opl_rgx_str, num_opl_rgx, num_opt_rgx_str, num_opt_rgx, num_rgx_str, num_rgx
+from .numbers   import sci_rgx_str, sci_rgx
 from .times     import format_run_time
 
 __all__ = [
@@ -16,65 +24,42 @@ __all__ = [
     "check_interval_str_match",
     "check_std_interval_str_match",
     "check_valid_interval_values",
-    "flt_bsc_opl_rgx_str",
-    "flt_bsc_opl_rgx",
-    "flt_bsc_opt_rgx_str",
-    "flt_bsc_opt_rgx",
     "flt_bsc_rgx_str",
     "flt_bsc_rgx",
-    "flt_bsc_rlx_rgx_str",
-    "flt_bsc_rlx_rgx",
-    "flt_bsc_sct_rgx_str",
-    "flt_bsc_sct_rgx",
     "flt_rgx_str",
     "flt_rgx",
-    "flt_rlx_rgx_str",
-    "flt_rlx_rgx",
-    "flt_sct_rgx_str",
-    "flt_sct_rgx",
     "format_interval",
     "format_number",
     "format_run_time",
+    "interval_rgx_str",
+    "interval_rgx",
+    "int_bas_rgx_str",
+    "int_bas_rgx",
+    "int_bsc_rgx_str",
+    "int_bsc_rgx",
     "int_rgx_str",
     "int_rgx",
-    "int_sct_rgx_str",
-    "int_sct_rgx",
+    "is_basic_float",
+    "is_basic_int",
     "is_float",
     "is_float_interval",
     "is_int",
     "is_int_interval",
-    "is_interval",
     "is_interval_str",
+    "is_non_decimal",
     "is_number",
+    "is_scinot",
     "is_std_interval_str",
-    "num_bsc_opl_rgx_str",
-    "num_bsc_opl_rgx",
-    "num_bsc_opt_rgx_str",
-    "num_bsc_opt_rgx",
-    "num_bsc_rgx_str",
-    "num_bsc_rgx",
-    "num_bsc_rlx_rgx_str",
-    "num_bsc_rlx_rgx",
-    "num_bsc_sct_rgx_str",
-    "num_bsc_sct_rgx",
     "num_opl_rgx_str",
     "num_opl_rgx",
     "num_opt_rgx_str",
     "num_opt_rgx",
     "num_rgx_str",
     "num_rgx",
-    "num_rlx_rgx_str",
-    "num_rlx_rgx",
-    "num_sct_rgx_str",
-    "num_sct_rgx",
     "sci_rgx_str",
     "sci_rgx",
-    "sci_rlx_rgx_str",
-    "sci_rlx_rgx",
-    "sci_sct_rgx_str",
-    "sci_sct_rgx",
-    "sgn_opt_rgx_str",
-    "sgn_req_rgx_str",
+    "std_interval_rgx_str",
+    "std_interval_rgx",
     "to_interval",
     "to_number",
     "to_std_interval_str"
