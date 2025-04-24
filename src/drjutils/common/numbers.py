@@ -524,9 +524,11 @@ r"""
     *   `\s*`               <br/>Optional Whitespace
     0.  `(...)`             <br/>Capture Group 0
         *   `[+-]?`         <br/>Sign
-        *   `\d+(?:\.\d+)?` <br/>Integer or Float (significand)
-        *   `[eE]`          <br/>Exponent Indicator
-        *   `[+-]\d+`       <br/>Sign and exponent value
+        *   Float or Integer
+        *   `(?:...|...)`   <br/>Non-Capturing Option Group
+            *   `\d+\.?\d*` <br/>Integer or Float (trailing zero optional)
+            *   `\.\d+`     <br/>Float (no leading zero)
+        *   `e[+-]?\d+`     <br/>Scientific Notation
     *   `\s*`               <br/>Optional Whitespace
     *   `$`                 <br/>End
 """
@@ -541,10 +543,13 @@ def format_number(num: Number) -> str:
     Returns:
         str: The formatted number.
     """
-    flt = float(num)
-    # Use int if it’s an exact whole number
-    # Otherwise, trim trailing zeros while keeping enough precision
-    return str(int(flt)) if flt.is_integer() else f"{flt:.15g}"
+    if isinstance(num, int):
+        return str(num)
+    if isinstance(num, float):
+        # Use float to handle the conversion
+        # Convert to float to remove any trailing zeros
+        # Use 15 significant digits for precision
+        return f"{num:.15g}"
 
 def is_basic_float(num: str) -> bool:
     """
@@ -640,9 +645,9 @@ def to_number(num: str) -> Union[int, float]:
     Returns:
         Union[int, float]: The converted number.
     """
-    if int_rgx.match(num):
-        return int(num)
-    if flt_rgx.match(num):
+    if is_int(num):
+        return int(num, 0) if is_non_decimal(num) else int(num)
+    if is_float(num):
         return float(num)
-    
+
     raise ValueError(f"Invalid number format: {num}")
