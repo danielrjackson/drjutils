@@ -6,10 +6,10 @@ This module provides common utility functions for path management, string format
 Copyright 2025 Daniel Robert Jackson
 """
 
-from .intervals import check_interval_str_match, check_std_interval_str_match, check_valid_interval_values
+from .intervals import check_interval_str_match, check_valid_interval_values
 from .intervals import format_interval, to_interval, to_std_interval_str
 from .intervals import is_float_interval, is_int_interval, is_interval_str, is_std_interval_str
-from .intervals import interval_rgx_str, interval_rgx, std_interval_rgx_str, std_interval_rgx
+from .intervals import interval_rgx_str, interval_rgx
 from .paths     import BaseProjectPaths
 from .numbers   import format_number, to_number
 from .numbers   import is_basic_float, is_basic_int, is_float, is_int, is_non_decimal, is_number, is_scinot

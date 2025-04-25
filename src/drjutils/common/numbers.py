@@ -1,9 +1,40 @@
 """
-Number Utilities[+-]?
+Number Utilities
 
 This module provides utilities for working with numbers (and strings that represent numbers).
 
 Copyright 2025 Daniel Robert Jackson
+
+methods:
+    `format_number`
+    `is_basic_float`
+    `is_basic_int`
+    `is_float`
+    `is_int`
+    `is_non_decimal`
+    `is_number`
+    `is_scinot`
+    `to_number`
+
+members:
+    `flt_bsc_rgx_str`
+    `flt_bsc_rgx`
+    `flt_rgx_str`
+    `flt_rgx`
+    `int_bas_rgx_str`
+    `int_bas_rgx`
+    `int_bsc_rgx_str`
+    `int_bsc_rgx`
+    `int_rgx_str`
+    `int_rgx`
+    `num_opl_rgx_str`
+    `num_opl_rgx`
+    `num_opt_rgx_str`
+    `num_opt_rgx`
+    `num_rgx_str`
+    `num_rgx`
+    `sci_rgx_str`
+    `sci_rgx`
 """
 
 """
@@ -46,25 +77,26 @@ __all__ = [
 ### Floating point numbers ###
 
 flt_bsc_rgx_str = r"[+-]?(?:\d+\.\d*|\.\d+)"
-"""
+r"""
 ### Basic Float
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Strict Complete Float Only
 *   Scientific Notation Not Supported
-*   e.g.: 0.0, +0.0, -0.0, 1.0, +0.2, -34.56, 00.07, etc.
+*   e.g.: `0.0`, `+0.0`, `-0.0`, `1.0`, `+0.2`, `-34.56`, `00.07`, etc.
 *   Pattern
     *   `[+-]?`         <br/>Sign
     *   `(?:...|...)`   <br/>Non-Capturing Option Group
         *   `\d+\.\d*`  <br/>Float (trailing zero optional)
         *   `\.\d+`     <br/>Float (no leading zero)
 """
-flt_bsc_rgx = compile(f"^\s*({flt_bsc_rgx_str})\s*$")
+
+flt_bsc_rgx = compile(rf"^\s*({flt_bsc_rgx_str})\s*$")
 r"""
 ### Basic Float
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Strict Complete Float Only
 *   Scientific Notation Not Supported
-*   e.g.: 0.0, +0.0, -0.0, 1.0, +0.2, -34.56, 00.07, etc.
+*   e.g.: `0.0`, `+0.0`, `-0.0`, `1.0`, `+0.2`, `-34.56`, `00.07`, etc.
 *   Pattern: `^\s*([+-]?(?:\d+\.\d*|\.\d+))\s*$`
     *   `^`             <br/>Start
     *   `\s*`           <br/>Optional Whitespace
@@ -78,19 +110,19 @@ r"""
 """
 
 flt_rgx_str = r"[+-]?(?:(?:\d+\.\d*|\.\d+|\d+(?=e))(?:e[+-]?\d+)?|inf(?:inity)?|nan)"
-"""
+r"""
 ### Float Number
 *   Supports All Valid Float Formats
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Any Valid Float (Not Integer)
 *   Scientific Notation Supported
     *   Significand:    digit followed by optional decimal and digits
-    *   Exponent:       e followed by optional sign (+ or -) and required int digits
+    *   Exponent:       `e` followed by optional sign (`+` or `-`) and required int digits
 *   Special Cases:
     *   Infinity:       inf or infinity
     *   Not a Number:   nan
 *   Be sure to use the `IGNORECASE` flag when compiling this regex
-*   e.g.: 1.0, +0.2, -34.56, 7.8e+0, -9.0E-1, 2.3e4, 56E67, inf, -Infinity, NaN, etc.
+*   e.g.: `1.0`, `+0.2`, `-34.56`, `7.8e+0`, `-9.0E-1`, `2.3e4`, `56E67`, `inf`, `-Infinity`, `NaN`, etc.
 *   Pattern
     *   `[+-]?`                 <br/>Sign
     *   Valid Float (Not Integer)
@@ -112,20 +144,20 @@ flt_rgx_str = r"[+-]?(?:(?:\d+\.\d*|\.\d+|\d+(?=e))(?:e[+-]?\d+)?|inf(?:inity)?|
             *   Not a Number:
                 *   `nan`       <br/>Not a Number
 """
-flt_rgx = compile(f"^\s*({flt_rgx_str})\s*$", flags=IGNORECASE)
+flt_rgx = compile(rf"^\s*({flt_rgx_str})\s*$", flags=IGNORECASE)
 r"""
 ### Float Number
 *   Supports All Valid Float Formats
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Any Valid Float (Not Integer)
 *   Scientific Notation Supported
     *   Significand:    digit followed by optional decimal and digits
-    *   Exponent:       e followed by optional sign (+ or -) and required int digits
+    *   Exponent:       `e` followed by optional sign (`+` or `-`) and required int digits
 *   Special Cases:
     *   Infinity:       inf or infinity
     *   Not a Number:   nan
 *   Be sure to use the `IGNORECASE` flag when compiling this regex
-*   e.g.: 1.0, +0.2, -34.56, 7.8e+0, -9.0E-1, 2.3e4, 56E67, inf, -Infinity, NaN, etc.
+*   e.g.: `1.0`, `+0.2`, `-34.56`, `7.8e+0`, `-9.0E-1`, `2.3e4`, `56E67`, `inf`, `-Infinity`, `NaN`, etc.
 *   Pattern: `^\s*([+-]?(?:(?:\d+\.\d*|\.\d+|\d+(?=e))(?:e[+-]?\d+)?|inf(?:inity)?|nan))\s*$`
     *   `^`                         <br/>Start
     *   `\s*`                       <br/>Optional Whitespace
@@ -156,16 +188,16 @@ r"""
 ### Integers ###
 
 int_bas_rgx_str = r"[+-]?0(?:x[\da-f]+|b[01]+|o[0-7]+)"
-"""
+r"""
 ### Integer Number (Non-Decimal Bases Only)
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Non-Decimal Bases:
-    *   Hexadecimal:    0x followed by hex digits (0-9, a-f)
-        *   e.g.: 0x1a, 0X2F, 0x3b, etc.
-    *   Binary:         0b followed by binary digits (0-1)
-        *   e.g.: 0b1010, 0B1101, 0b1110, etc.
-    *   Octal:          0o followed by octal digits (0-7)
-        *   e.g.: 0o12, 0O34, 0o56, etc.
+    *   Hexadecimal:    `0x` followed by hex digits (`0-9`, `a-f`)
+        *   e.g.: `0x1a`, `0X2F`, `0x3b`, etc.
+    *   Binary:         `0b` followed by binary digits (`0-1`)
+        *   e.g.: `0b1010`, `0B1101`, `0b1110`, etc.
+    *   Octal:          `0o` followed by octal digits (`0-7`)
+        *   e.g.: `0o12`, `0O34`, `0o56`, etc.
 *   Be sure to use the `IGNORECASE` flag when compiling this regex
 *   Pattern
     *   `[+-]?`         <br/>Sign
@@ -175,17 +207,17 @@ int_bas_rgx_str = r"[+-]?0(?:x[\da-f]+|b[01]+|o[0-7]+)"
         *   `b[01]+`    <br/>Binary
         *   `o[0-7]+`   <br/>Octal
 """
-int_bas_rgx = compile(f"^\s*({int_bas_rgx_str})\s*$", flags=IGNORECASE)
+int_bas_rgx = compile(rf"^\s*({int_bas_rgx_str})\s*$", flags=IGNORECASE)
 r"""
 ### Integer Number (Non-Decimal Bases Only)
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Non-Decimal Bases:
-    *   Hexadecimal:    0x followed by hex digits (0-9, a-f)
-        *   e.g.: 0x1a, 0X2F, 0x3b, etc.
-    *   Binary:         0b followed by binary digits (0-1)
-        *   e.g.: 0b1010, 0B1101, 0b1110, etc.
-    *   Octal:          0o followed by octal digits (0-7)
-        *   e.g.: 0o12, 0O34, 0o56, etc.
+    *   Hexadecimal:    `0x` followed by hex digits (`0-9`, `a-f`)
+        *   e.g.: `0x1a`, `0X2F`, `0x3b`, etc.
+    *   Binary:         `0b` followed by binary digits (`0-1`)
+        *   e.g.: `0b1010`, `0B1101`, `0b1110`, etc.
+    *   Octal:          `0o` followed by octal digits (`0-7`)
+        *   e.g.: `0o12`, `0O34`, `0o56`, etc.
 *   Pattern: `^\s*([+-]?0(?:x[\da-f]+|b[01]+|o[0-7]+))\s*$`
     *   `^`                 <br/>Start
     *   `\s*`               <br/>Optional Whitespace
@@ -201,21 +233,21 @@ r"""
 """
 
 int_bsc_rgx_str = r"[+-]?\d+"
-"""
+r"""
 ### Integer Number (Basic)
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Integer Only
-*   e.g.: 1, +2, -3, +0, -0, 42, 0012, etc.
+*   e.g.: `1`, `+2`, `-3`, `+0`, `-0`, `42`, `0012`, etc.
 *   Pattern
     *   `[+-]?` <br/>Sign
     *   `\d+`   <br/>Integer
 """
-int_bsc_rgx = compile(f"^\s*({int_bsc_rgx_str})\s*$")
+int_bsc_rgx = compile(rf"^\s*({int_bsc_rgx_str})\s*$")
 r"""
 ### Integer Number (Basic)
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Integer Only
-*   e.g.: 1, +2, -3, +0, -0, 42, 0012, etc.
+*   e.g.: `1`, `+2`, `-3`, `+0`, `-0`, `42`, `0012`, etc.
 *   Pattern: `^\s*([+-]?\d+)\s*$`
     *   `^`         <br/>Start
     *   `\s*`       <br/>Optional Whitespace
@@ -227,19 +259,19 @@ r"""
 """
 
 int_rgx_str = r"[+-]?(?:\d+|0(?:x[\da-f]+|b[01]+|o[0-7]+))"
-"""
+r"""
 ### Integer Number
 *   Supports All Valid Integer Formats
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Integers Only
-    *   e.g.: 1, +2, -3, +0, -0, 42, 0012, etc.
+    *   e.g.: `1`, `+2`, `-3`, `+0`, `-0`, `42`, `0012`, etc.
 *   Supports Non-Decimal Bases:
-    *   Hexadecimal:    0x followed by hex digits (0-9, a-f)
-        *   e.g.: 0x1a, 0X2F, 0x3b, etc.
-    *   Binary:         0b followed by binary digits (0-1)
-        *   e.g.: 0b1010, 0B1101, 0b1110, etc.
-    *   Octal:          0o followed by octal digits (0-7)
-        *   e.g.: 0o12, 0O34, 0o56, etc.
+    *   Hexadecimal:    `0x` followed by hex digits (`0-9`, `a-f`)
+        *   e.g.: `0x1a`, `0X2F`, `0x3b`, etc.
+    *   Binary:         `0b` followed by binary digits (`0-1`)
+        *   e.g.: `0b1010`, `0B1101`, `0b1110`, etc.
+    *   Octal:          `0o` followed by octal digits (`0-7`)
+        *   e.g.: `0o12`, `0O34`, `0o56`, etc.
 *   Be sure to use the `IGNORECASE` flag when compiling this regex
 *   Pattern
     *   `[+-]?`                 <br/>Sign
@@ -252,20 +284,20 @@ int_rgx_str = r"[+-]?(?:\d+|0(?:x[\da-f]+|b[01]+|o[0-7]+))"
                 *   `b[01]+`    <br/>Binary
                 *   `o[0-7]+`   <br/>Octal
 """
-int_rgx = compile(f"^\s*({int_rgx_str})\s*$", flags=IGNORECASE)
+int_rgx = compile(rf"^\s*({int_rgx_str})\s*$", flags=IGNORECASE)
 r"""
 ### Integer Number
 *   Supports All Valid Integer Formats
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Integers Only
-    *   e.g.: 1, +2, -3, +0, -0, 42, 0012, etc.
+    *   e.g.: `1`, `+2`, `-3`, `+0`, `-0`, `42`, `0012`, etc.
 *   Supports Non-Decimal Bases:
-    *   Hexadecimal:    0x followed by hex digits (0-9, a-f)
-        *   e.g.: 0x1a, 0X2F, 0x3b, etc.
-    *   Binary:         0b followed by binary digits (0-1)
-        *   e.g.: 0b1010, 0B1101, 0b1110, etc.
-    *   Octal:          0o followed by octal digits (0-7)
-        *   e.g.: 0o12, 0O34, 0o56, etc.
+    *   Hexadecimal:    `0x` followed by hex digits (`0-9`, `a-f`)
+        *   e.g.: `0x1a`, `0X2F`, `0x3b`, etc.
+    *   Binary:         `0b` followed by binary digits (`0-1`)
+        *   e.g.: `0b1010`, `0B1101`, `0b1110`, etc.
+    *   Octal:          `0o` followed by octal digits (`0-7`)
+        *   e.g.: `0o12`, `0O34`, `0o56`, etc.
 *   Pattern: `^\s*([+-]?(?:\d+|0(?:x[\da-f]+|b[01]+|o[0-7]+)))\s*$`
     *   `^`                         <br/>Start
     *   `\s*`                       <br/>Optional Whitespace
@@ -286,20 +318,20 @@ r"""
 ### Generic Numbers (Floats or Ints) ###
 
 num_rgx_str = r"[+-]?(?:(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|0(?:x[\da-f]+|b[01]+|o[0-7]+)|inf(?:inity)?|nan)"
-"""
+r"""
 ### Number
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Basic Floats or Integer
-    *   e.g.: 1, +2, -3, 0, +0, -0, 45, 6.0, +7.8, -9.0, 0.0, 0.1, 23., .45, etc.
+    *   e.g.: `1`, `+2`, `-3`, `0`, `+0`, `-0`, `45`, `6.0`, `+7.8`, `-9.0`, `0.0`, `0.1`, `23.`, `.45`, etc.
 *   Scientific Notation Supported
-    *   e.g.: 0.0e+1, 1.0E-2, 2.3e4, 56E67, etc.
+    *   e.g.: `0.0e+1`, `1.0E-2`, `2.3e4`, `56E67`, etc.
 *   Non-Decimal Bases Supported:
-    *   Hexadecimal:    0x followed by hex digits (0-9, a-f)
-        *   e.g.: 0x1a, 0X2F, 0x3b, etc.
-    *   Binary:         0b followed by binary digits (0-1)
-        *   e.g.: 0b1010, 0B1101, 0b1110, etc.
-    *   Octal:          0o followed by octal digits (0-7)
-        *   e.g.: 0o12, 0O34, 0o56, etc.
+    *   Hexadecimal:    `0x` followed by hex digits (`0-9`, `a-f`)
+        *   e.g.: `0x1a`, `0X2F`, `0x3b`, etc.
+    *   Binary:         `0b` followed by binary digits (`0-1`)
+        *   e.g.: `0b1010`, `0B1101`, `0b1110`, etc.
+    *   Octal:          `0o` followed by octal digits (`0-7`)
+        *   e.g.: `0o12`, `0O34`, `0o56`, etc.
 *   Special Cases:
     *   Infinity:       inf or infinity
     *   Not a Number:   nan
@@ -324,21 +356,21 @@ num_rgx_str = r"[+-]?(?:(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|0(?:x[\da-f]+|b[01]+|o
             *   Infinity:           <br/>`inf` or `infinity`
             *   Not a Number:       <br/>`nan`
 """
-num_rgx = compile(f"^\s*({num_rgx_str})\s*$", flags=IGNORECASE)
+num_rgx = compile(rf"^\s*({num_rgx_str})\s*$", flags=IGNORECASE)
 r"""
 ### Number
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Basic Floats or Integer
-    *   e.g.: 1, +2, -3, 0, +0, -0, 45, 6.0, +7.8, -9.0, 0.0, 0.1, 23., .45, etc.
+    *   e.g.: `1`, `+2`, `-3`, `0`, `+0`, `-0`, `45`, `6.0`, `+7.8`, `-9.0`, `0.0`, `0.1`, `23.`, `.45`, etc.
 *   Scientific Notation Supported
-    *   e.g.: 0.0e+1, 1.0E-2, 2.3e4, 56E67, etc.
+    *   e.g.: `0.0e+1`, `1.0E-2`, `2.3e4`, `56E67`, etc.
 *   Non-Decimal Bases Supported:
-    *   Hexadecimal:    0x followed by hex digits (0-9, a-f)
-        *   e.g.: 0x1a, 0X2F, 0x3b, etc.
-    *   Binary:         0b followed by binary digits (0-1)
-        *   e.g.: 0b1010, 0B1101, 0b1110, etc.
-    *   Octal:          0o followed by octal digits (0-7)
-        *   e.g.: 0o12, 0O34, 0o56, etc.
+    *   Hexadecimal:    `0x` followed by hex digits (`0-9`, `a-f`)
+        *   e.g.: `0x1a`, `0X2F`, `0x3b`, etc.
+    *   Binary:         `0b` followed by binary digits (`0-1`)
+        *   e.g.: `0b1010`, `0B1101`, `0b1110`, etc.
+    *   Octal:          `0o` followed by octal digits (`0-7`)
+        *   e.g.: `0o12`, `0O34`, `0o56`, etc.
 *   Special Cases:
     *   Infinity:       inf or infinity
     *   Not a Number:   nan
@@ -369,18 +401,18 @@ r"""
 """
 
 num_opl_rgx_str = rf"{num_rgx_str}(?<!\.)"
-"""
+r"""
 ### Number (leading zero optional)
 *   Cannot end with a decimal point
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Float or Integer (leading zero optional)
 *   Scientific Notation Not Supported
-*   e.g.: 1, +2, -3, 0, +0, -0, 45, 6.0, +7.8, -9.0, 0.0, 0.1, .23, etc.
+*   e.g.: `1`, `+2`, `-3`, `0`, `+0`, `-0`, `45`, `6.0`, `+7.8`, `-9.0`, `0.0`, `0.1`, `.23`, etc.
 *   Be sure to use the `IGNORECASE` flag when compiling this regex
 *   Pattern: `[+-]?(?:(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|0(?:x[\da-f]+|b[01]+|o[0-7]+)|inf(?:inity)?|nan)(?<!\.)`
-    *   `[+-]?`                     <br/>Sign
+    *   `[+-]?`                         <br/>Sign
     *   Float or Integer
-    *   `(?:...|...)`               <br/>Non-Capturing Option Group
+    *   `(?:...|...)`                   <br/>Non-Capturing Option Group
         *   If Float or Base-10 Integer:
             *   `(?:...|...)`       <br/>Non-Capturing Option Group
                 *   `\d+\.?\d*`     <br/>Integer or Float (trailing zero optional)
@@ -398,14 +430,14 @@ num_opl_rgx_str = rf"{num_rgx_str}(?<!\.)"
             *   Not a Number:       <br/>`nan`
     *   `(?<!\.)`                   <br/>Cannot end with a decimal point
 """
-num_opl_rgx = compile(f"^\s*({num_opl_rgx_str})\s*$", flags=IGNORECASE)
+num_opl_rgx = compile(rf"^\s*({num_opl_rgx_str})\s*$", flags=IGNORECASE)
 r"""
 ### Number (leading zero optional)
 *   Cannot end with a decimal point
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Float or Integer (leading zero optional)
 *   Scientific Notation Not Supported
-*   e.g.: 1, +2, -3, 0, +0, -0, 45, 6.0, +7.8, -9.0, 0.0, 0.1, .23, etc.
+*   e.g.: `1`, `+2`, `-3`, `0`, `+0`, `-0`, `45`, `6.0`, `+7.8`, `-9.0`, `0.0`, `0.1`, `.23`, etc.
 *   Pattern: `^\s*([+-]?(?:(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|0(?:x[\da-f]+|b[01]+|o[0-7]+)|inf(?:inity)?|nan)(?<!\.))\s*$`
     *   `^`                             <br/>Start
     *   `\s*`                           <br/>Optional Whitespace
@@ -434,13 +466,13 @@ r"""
 """
 
 num_opt_rgx_str = rf"(?!\.){num_rgx_str}"
-"""
+r"""
 ### Basic Number (trailing zero optional)
 *   Cannot start with a decimal point
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Float or Integer (trailing zero optional)
 *   Scientific Notation Not Supported
-*   e.g.: 1, +2, -3, 0, +0, -0, 45, 6.0, +7.8, -9.0, 0.0, 0.1, 23., etc.
+*   e.g.: `1`, `+2`, `-3`, `0`, `+0`, `-0`, `45`, `6.0`, `+7.8`, `-9.0`, `0.0`, `0.1`, `23.`, etc.
 *   Be sure to use the `IGNORECASE` flag when compiling this regex
 *   Pattern: `(?!\.)[+-]?(?:(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|0(?:x[\da-f]+|b[01]+|o[0-7]+)|inf(?:inity)?|nan)`
     *   `(?!\.)`                    <br/>Cannot start with a decimal point
@@ -463,14 +495,14 @@ num_opt_rgx_str = rf"(?!\.){num_rgx_str}"
             *   Infinity:           <br/>`inf` or `infinity`
             *   Not a Number:       <br/>`nan`
 """
-num_opt_rgx = compile(f"^\s*({num_opt_rgx_str})\s*$", flags=IGNORECASE)
+num_opt_rgx = compile(rf"^\s*({num_opt_rgx_str})\s*$", flags=IGNORECASE)
 r"""
 ### Basic Number (trailing zero optional)
 *   Cannot start with a decimal point
-*   Sign (optional + or -)
+*   Sign (optional `+` or `-`)
 *   Float or Integer (trailing zero optional)
 *   Scientific Notation Not Supported
-*   e.g.: 1, +2, -3, 0, +0, -0, 45, 6.0, +7.8, -9.0, 0.0, 0.1, 23., etc.
+*   e.g.: `1`, `+2`, `-3`, `0`, `+0`, `-0`, `45`, `6.0`, `+7.8`, `-9.0`, `0.0`, `0.1`, `23.`, etc.
 *   Pattern: `(?!\.)[+-]?(?:(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?|0(?:x[\da-f]+|b[01]+|o[0-7]+)|inf(?:inity)?|nan)`
     *   `^`                             <br/>Start
     *   `\s*`                           <br/>Optional Whitespace
@@ -501,10 +533,10 @@ r"""
 ### Scientific notation supported numbers ###
 
 sci_rgx_str = r"[+-]?(?:\d+\.?\d*|\.\d+)e[+-]?\d+"
-"""
+r"""
 ### Scientific Notation Only
-*   Sign (optional + or -)
-*   e.g.: 0.0e+1, 1.0E-2, 2.3e4, 56E67, etc.
+*   Sign (optional `+` or `-`)
+*   e.g.: `0.0e+1`, `1.0E-2`, `2.3e4`, `56E67`, etc.
 *   Be sure to use the `IGNORECASE` flag when compiling this regex
 *   Pattern
     *   `[+-]?`         <br/>Sign
@@ -514,11 +546,11 @@ sci_rgx_str = r"[+-]?(?:\d+\.?\d*|\.\d+)e[+-]?\d+"
         *   `\.\d+`     <br/>Float (no leading zero)
     *   `e[+-]?\d+`     <br/>Scientific Notation
 """
-sci_rgx = compile(f"^\s*({sci_rgx_str})\s*$", flags=IGNORECASE)
+sci_rgx = compile(rf"^\s*({sci_rgx_str})\s*$", flags=IGNORECASE)
 r"""
 ### Scientific Notation Only
-*   Sign (optional + or -)
-*   e.g.: 0.0e+1, 1.0E-2, 2.3e4, 56E67, etc.
+*   Sign (optional `+` or `-`)
+*   e.g.: `0.0e+1`, `1.0E-2`, `2.3e4`, `56E67`, etc.
 *   Pattern: `^\s*([+-]?(?:\d+\.?\d*|\.\d+)e[+-]?\d+)\s*$`
     *   `^`                 <br/>Start
     *   `\s*`               <br/>Optional Whitespace
