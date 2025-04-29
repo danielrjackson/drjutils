@@ -1,11 +1,13 @@
 """
 Unit tests for the Numbers module.
 
-This module provides comprehensive testing for the number-related utilities 
-in the drjutils.common.numbers module.
+Copyright 2025 Daniel Robert Jackson
 """
 
+# Test Libraries
 import pytest
+
+# Module Under Test
 from drjutils.common.numbers import (
     format_number,
     is_basic_float,
