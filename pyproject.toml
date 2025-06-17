@@ -3,27 +3,33 @@
     version         = "0.1.0"
     description     = "Common utilities shared across my projects"
     authors         = [{ name = "Daniel Jackson", email = "643707+danielrjackson@users.noreply.github.com" }]
-    requires-python = "~=3.13"  # Newest version of python
+    requires-python = "~=3.13"      # Newest version of python
     readme          = { file = "README.md", content-type = "text/markdown" }
     license         = { file = "LICENSE.md" }
     dependencies    = [
-        "intvalpy>=1.6.5,<2",   # Integer arithmetic in Python
-        "keyring>=25.6.0,<26",  # Access API Keys from system credential manager
-        "mcp[cli]>=1.6.0,<2",   # Model Context Protocol CLI interface
-#        "numpy>=2.2.5,<3",      # Numerical Computing
-        "pyyaml>=6.0.2,<7",     # Read YAML files
+        "attrs>=25.3.0",
+        "casefy>=1.1.0,<2", # String manipulation
+        "keyring>=25.6.0,<26", # Access API Keys from system credential manager
+        "mcp[cli]>=1.6.0,<2", # Model Context Protocol CLI interface
+        "pydantic>=2.11.2", # Data validation and settings management
+        "pyyaml>=6.0.2,<7", # Read YAML files
+        "regex>=2024.11.6", # Regular expression operations
+        "sympy>=1.14.0,<2", # Symbolic mathematics library
 ]
 
-[build-system]
-    requires        = ["hatchling"]
-    build-backend   = "hatchling.build"
-
-[dependency-groups]
+[project.optional-dependencies]
     dev = [
         "coverage>=7.7.1,<8",       # Test coverage report
         "hypothesis>=6.130.4,<7",   # Fuzzy testing
         "pytest>=7.4.4,<8",         # Python testing library
     ]
+
+[build-system]
+    requires        = ["hatchling"]
+    build-backend   = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+    packages = ["src/drjutils"]
 
 [tool.pytest.ini_options]
     pythonpath = ["src"]

@@ -11,47 +11,58 @@ import pytest
 from sympy import Interval
 
 # Module Under Test
-from drjutils.common.intervals import check_interval_str_match, check_std_interval_str_match, check_valid_interval_values, format_interval, interval_rgx, is_float_interval, is_int_interval, is_interval_str, is_std_interval_str, std_interval_rgx, to_interval, to_std_interval_str
+from drjutils.common.intervals import (
+    check_valid_interval_values,
+    extract_interval_elements,
+    format_interval,
+    is_float_interval, is_int_interval, is_interval_str,
+    to_interval,
+    interval_rgx
+    )
 
 # Test Constants
 std_int_intervals = [
-    "[1 .. 2]",
-    "(1 .. 2)",
-    "[1 .. 2)",
-    "(1 .. 2]",
-    "[-1 .. 0]",
-    "(-1 .. 0)",
-    "[-1 .. 1]"
+    ("[1 .. 2]",            Interval( 1, 2, left_open=False,    right_open=False)),
+    ("(1 .. 2)",            Interval( 1, 2, left_open=True,     right_open=True)),
+    ("[1 .. 2)",            Interval( 1, 2, left_open=False,    right_open=True)),
+    ("(1 .. 2]",            Interval( 1, 2, left_open=True,     right_open=False)),
+    ("[-1 .. 0]",           Interval(-1, 0, left_open=False,    right_open=False)),
+    ("(-1 .. 0)",           Interval(-1, 0, left_open=True,     right_open=True)),
+    ("[0 .. 1)",            Interval( 0, 1, left_open=False,    right_open=True)),
+    ("(0 .. 1]",            Interval( 0, 1, left_open=True,     right_open=False)),
+    ("[-1 .. 1]",           Interval(-1, 1, left_open=False,    right_open=False))
 ]
 
 valid_int_intervals = std_int_intervals + [
-    "[1..2]",
-    "(1..2)",
-    "[1..2)",
-    "(1..2]",
-    "[1 .. 2] ",
-    " (1 .. 2)",
-    "[1 .. 2 ]",
-    "[ 1 ..2 )",
-    "( 1.. 2 ]",
-    "( 1 .. 2 )",
-    "(   1  ..  2  )",
-    "1..2",
-    "1 .. 2",
-    " 1..2",
-    "1..2 ",
-    "  1   ..  2    "
+    ("[1..2]",              Interval(1, 2, left_open=False, right_open=False)),
+    ("(1..2)",              Interval(1, 2, left_open=True,  right_open=True)),
+    ("[1..2)",              Interval(1, 2, left_open=False, right_open=True)),
+    ("(1..2]",              Interval(1, 2, left_open=True,  right_open=False)),
+    ("[1 .. 2] ",           Interval(1, 2, left_open=False, right_open=False)),
+    (" (1 .. 2)",           Interval(1, 2, left_open=True,  right_open=True)),
+    ("[1 .. 2 ]",           Interval(1, 2, left_open=False, right_open=False)),
+    ("[ 1 ..2 )",           Interval(1, 2, left_open=False, right_open=True)),
+    ("( 1.. 2 ]",           Interval(1, 2, left_open=True,  right_open=False)),
+    ("(   1  ..  2  )",     Interval(1, 2, left_open=True,  right_open=True)),
+    ("1..2",                Interval(1, 2, left_open=False, right_open=False)),
+    ("1 .. 2",              Interval(1, 2, left_open=False, right_open=False)),
+    (" 1..2",               Interval(1, 2, left_open=False, right_open=False)),
+    ("1..2 ",               Interval(1, 2, left_open=False, right_open=False)),
+    ("  1   ..  2    ",     Interval(1, 2, left_open=False, right_open=False)),
+    ("[0x0001 .. 0x0002]",  Interval(1, 2, left_open=False, right_open=False))
 ]
 
 std_float_intervals = [
-    "[0.5 .. 3.5]",
-    "(0.5 .. 3.5)",
-    "[0.5 .. 3.5)",
-    "(0.5 .. 3.5]",
-    "[1.0e-5 .. 2.0e+5]",
-    "(1.0e-5 .. 2.0e+5)",
-    "[1.0e-5 .. 2.0e+5)",
-    "(1.0e-5 .. 2.0e+5]"
+    ("[0.5 .. 3.5]",        Interval(0.5,           3.5,            left_open=False,    right_open=False)),
+    ("(0.5 .. 3.5)",        Interval(0.5,           3.5,            left_open=True,     right_open=True)),
+    ("[0.5 .. 3.5)",        Interval(0.5,           3.5,            left_open=False,    right_open=True)),
+    ("(0.5 .. 3.5]",        Interval(0.5,           3.5,            left_open=True,     right_open=False)),
+    ("[1.0e-5 .. 2.0e+15]", Interval(1.0e-5,        2.0e+15,        left_open=False,    right_open=False)),
+    ("(1.0e-5 .. 2.0e+15)", Interval(1.0e-5,        2.0e+15,        left_open=True,     right_open=True)),
+    ("[1.0e-5 .. 2.0e+15)", Interval(1.0e-5,        2.0e+15,        left_open=False,    right_open=True)),
+    ("(1.0e-5 .. 2.0e+15]", Interval(1.0e-5,        2.0e+15,        left_open=True,     right_open=False)),
+    ("[-inf .. inf]",       Interval(float("-inf"), float("inf"),   left_open=False,    right_open=False)),
+    ("(-inf .. inf)",       Interval(float("-inf"), float("inf"),   left_open=True,     right_open=True)),
 ]
 
 valid_float_intervals = std_float_intervals + [
@@ -134,7 +145,7 @@ invalid_intervals = [
 
 @pytest.mark.parametrize("interval_str", valid_intervals)
 def test_check_interval_str_match_valid(interval_str):
-    assert check_interval_str_match(interval_str) is not None
+    assert check_valid_interval_values(interval_str) is not None
 
 @pytest.mark.parametrize("interval_str", invalid_intervals)
 def test_check_interval_str_match_invalid(interval_str):

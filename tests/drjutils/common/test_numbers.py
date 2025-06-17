@@ -10,7 +10,7 @@ import pytest
 # Module Under Test
 from drjutils.common.numbers import (
     format_number,
-    is_basic_float,
+    is_float_basic,
     is_basic_int,
     is_float,
     is_int,
@@ -23,8 +23,6 @@ from drjutils.common.numbers import (
     int_bas_rgx,
     int_bsc_rgx,
     int_rgx,
-    num_opl_rgx,
-    num_opt_rgx,
     num_rgx,
     sci_rgx
 )
@@ -61,9 +59,9 @@ class TestNumberUtilities:
         ("abc", False),   # Non-numeric
         ("", False),      # Empty string
     ])
-    def test_is_basic_float(self, num_str, expected):
+    def test_is_float_basic(self, num_str, expected):
         """Test basic float validation."""
-        assert is_basic_float(num_str) == expected
+        assert is_float_basic(num_str) == expected
 
     @pytest.mark.parametrize("num_str, expected", [
         ("0", True),
@@ -283,32 +281,6 @@ class TestNumberUtilities:
         assert int_rgx.match("0O755") is not None        # Uppercase octal
         assert int_rgx.match("3.14") is None             # Float
         assert int_rgx.match("1e-5") is None             # Scientific notation
-
-    def test_regex_number_opl(self):
-        """Verify regex patterns for numbers that cannot end with a decimal."""
-        # Test number regex for numbers that cannot end with a decimal point
-        assert num_opl_rgx.match("42") is not None
-        assert num_opl_rgx.match(" 42 ") is not None     # Whitespace
-        assert num_opl_rgx.match("3.14") is not None
-        assert num_opl_rgx.match(".5") is not None       # Leading zero optional
-        assert num_opl_rgx.match("5.") is None           # Ends with decimal
-        assert num_opl_rgx.match("1e-5") is not None
-        assert num_opl_rgx.match("0x1a") is not None     # Hexadecimal
-        assert num_opl_rgx.match("infinity") is not None # Infinity
-        assert num_opl_rgx.match("nan") is not None      # Not a number
-
-    def test_regex_number_opt(self):
-        """Verify regex patterns for numbers that cannot start with a decimal."""
-        # Test number regex for numbers that cannot start with a decimal point
-        assert num_opt_rgx.match("42") is not None
-        assert num_opt_rgx.match(" 42 ") is not None     # Whitespace
-        assert num_opt_rgx.match("3.14") is not None
-        assert num_opt_rgx.match(".5") is None           # Starts with decimal
-        assert num_opt_rgx.match("5.") is not None       # Trailing zero optional
-        assert num_opt_rgx.match("1e-5") is not None
-        assert num_opt_rgx.match("0x1a") is not None     # Hexadecimal
-        assert num_opt_rgx.match("infinity") is not None # Infinity
-        assert num_opt_rgx.match("nan") is not None      # Not a number
 
     def test_regex_number(self):
         """Verify regex patterns for all number types."""
