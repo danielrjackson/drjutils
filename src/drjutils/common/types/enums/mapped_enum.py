@@ -125,11 +125,13 @@ class MappedEnum(Enum):
         reps = value
         assert_str_reps_valid(reps, Self)
 
+        assert_str_reps_valid(reps, Self)
+
         obj = object.__new__(cls)
 
-        obj._value_ = tuple(reps)
-        obj._str_reps = obj._value_
-        obj._display_ = obj._value_[0]
+        obj._value_ = reps[0]
+        obj._str_reps = reps
+        obj._display_ = obj._value_
 
         return obj
 
