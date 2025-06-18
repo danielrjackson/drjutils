@@ -1,5 +1,5 @@
 # API Keys
-# Stored in securely Windows Credential Manager
+# Stored securely in Windows Credential Manager
 api_keys:
   - name:         OpenAI_DevKey
     service:      OpenAI_API

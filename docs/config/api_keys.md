@@ -22,17 +22,17 @@ API keys are defined in an `api_keys.yaml` file using this format:
 # Stored in Windows Credential Manager
 keys:
   - name: OpenAI_DevKey
-    url: OpenAI_API
+    service: OpenAI_API
     username: My_Dev_Key
 
   - name: AnthropicClaude
-    url: Anthropic_API
+    service: Anthropic_API
     username: Claude_Key
 ```
 
 Each key entry requires three fields:
 - `name`: A unique identifier for the key in your application
-- `url`: The service name in the credential store
+- `service`: The service name in the credential store
 - `username`: The account identifier in the credential store
 
 ## Configuration Location
@@ -140,11 +140,11 @@ To share configurations across all your projects:
    # Stored in Windows Credential Manager
    keys:
      - name: OpenAI_DevKey
-       url: OpenAI_API
+       service: OpenAI_API
        username: My_Dev_Key
      
      - name: AnthropicClaude
-       url: Anthropic_API
+       service: Anthropic_API
        username: Claude_Key
    ```
 
@@ -161,7 +161,7 @@ key_manager = get_key_manager()
 openai_key_config = key_manager.get_key_config("OpenAI_DevKey")
 
 if openai_key_config:
-    print(f"Service: {openai_key_config.url}")
+    print(f"Service: {openai_key_config.service}")
     print(f"Username: {openai_key_config.username}")
     
     # Get the key value
@@ -184,14 +184,14 @@ The system uses the `keyring` package to interact with credential managers:
 1. Open Control Panel
 2. Go to User Accounts → Credential Manager
 3. Switch to the "Windows Credentials" tab
-4. Look for entries matching your `url` values (e.g., "OpenAI_API")
+4. Look for entries matching your `service` values (e.g., "OpenAI_API")
 
 ### Manually Adding Credentials
 
 You can add credentials directly in Windows Credential Manager:
 
 1. In Credential Manager, click "Add a Windows credential"
-2. For "Internet or network address", enter the `url` from your config (e.g., "OpenAI_API")
+2. For "Internet or network address", enter the `service` from your config (e.g., "OpenAI_API")
 3. For "User name", enter the `username` from your config
 4. For "Password", enter your actual API key
 5. Click "OK" to save
