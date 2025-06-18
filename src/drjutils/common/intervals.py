@@ -5,7 +5,18 @@ import re
 from sympy import Interval
 from typing import Tuple
 
-interval_rgx = re.compile(r"^\s*([\[(])?\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)\s*\.\.\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)\s*([\])])?\s*$", re.IGNORECASE)
+interval_rgx = re.compile(
+    r"^\s*([\[(])?\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)\s*\.\.\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)\s*([\])])?\s*$",
+    re.IGNORECASE,
+)
+std_interval_rgx = re.compile(
+    r"^([\[(])"
+    r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)"
+    r" .. "
+    r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|inf(?:inity)?|nan)"
+    r"([\])])$",
+    re.IGNORECASE,
+)
 
 __all__ = [
     "check_valid_interval_values",
@@ -16,6 +27,11 @@ __all__ = [
     "is_interval_str",
     "to_interval",
     "interval_rgx",
+    "std_interval_rgx",
+    "check_interval_str_match",
+    "check_std_interval_str_match",
+    "is_std_interval_str",
+    "to_std_interval_str",
 ]
 
 
@@ -67,3 +83,29 @@ def to_interval(value: str) -> Interval:
     left_open = lb == "("
     right_open = rb == ")"
     return Interval(start_v, end_v, left_open, right_open)
+
+
+def check_interval_str_match(interval_str: str) -> re.Match:
+    """Return match object for *interval_str* or raise ``ValueError``."""
+    match = interval_rgx.fullmatch(interval_str)
+    if not match:
+        raise ValueError(f"Invalid interval: {interval_str}")
+    return match
+
+
+def check_std_interval_str_match(interval_str: str) -> re.Match:
+    """Return match object for standard interval string or raise ``ValueError``."""
+    match = std_interval_rgx.fullmatch(interval_str)
+    if not match:
+        raise ValueError(f"Invalid interval: {interval_str}")
+    return match
+
+
+def is_std_interval_str(value: str) -> bool:
+    """Return ``True`` if *value* is in standard interval format."""
+    return std_interval_rgx.fullmatch(value) is not None
+
+
+def to_std_interval_str(value: str | Interval | dict) -> str:
+    """Convert *value* to the standard interval string representation."""
+    return format_interval(value)

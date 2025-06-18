@@ -111,18 +111,23 @@ class KeyManager:
                          attempts to find an api_keys.yaml file in standard locations.
         """
         self.keys: Dict[str, ApiKey] = {}
+        self.config_path = config_path
+        self._load_config()
 
     def _load_config(self):
         """
         Load configuration from YAML file.
         """
         # Find keys config if not provided
+        config_path = self.config_path
         if config_path is None:
             config_path = find_api_keys_config()
-            
+
             if config_path is None:
                 warning("No api_keys.yaml found in standard locations")
                 return
+
+        self.config_path = config_path
         
         try:
             # Load the configuration file
