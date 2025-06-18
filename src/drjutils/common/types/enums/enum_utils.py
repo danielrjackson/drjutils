@@ -52,15 +52,23 @@ Standard Libraries
 from collections import defaultdict
 from collections.abc import Iterable
 from enum   import Enum
-from typing import Mapping, Optional, Sequence, Union
+from typing import Mapping, Optional, Sequence
 from typing_extensions import Overload, TypeAlias, TypeVar
+
+"""
+Project Libraries
+"""
+from drjutils.common.types.sentinel import Opt, UNSET
 
 __all__ = [
     # Data Types
     "EnumType",
+    "EnumToStrRepDict",
     "EnumToStrRepsDict",
+    "EnumToStrRepOrRepsDict",
     "StrRepToEnumDict",
     "StrReps",
+    "StrRepOrReps",
     # Utility Functions
     "assert_enum_and_str_reps_exist",
     "assert_enum_and_str_reps_valid",
@@ -80,7 +88,7 @@ StrReps: TypeAlias = tuple[str, ...]
 StringReps is a type alias for a tuple of string representation(s) for an Enum instance.
 """
 
-StrRepOrReps: TypeAlias = Union[str, StrReps]
+StrRepOrReps: TypeAlias = str | StrReps
 """
 StrRepOrReps is a type alias for either a tuple of string representation(s) or a single string
 representation.
@@ -98,7 +106,7 @@ EnumToStrRepsDict is a type alias for a dictionary mapping Enum members to their
 list of string representation(s).
 """
 
-EnumToStrRepOrRepsDict: TypeAlias = dict[EnumType, Union[str, StrReps]]
+EnumToStrRepOrRepsDict: TypeAlias = dict[EnumType, str] | dict[EnumType, StrReps]
 """
 EnumToStrRepOrRepsDict is a type alias for a dictionary mapping Enum members to either a single string
 or a tuple of string representation(s).
@@ -115,25 +123,13 @@ _StrReps: TypeAlias = Sequence[str]
 _StrReps is a type alias for a sequence of string representation(s) for an Enum instance.
 """
 
-_StrRepOrReps: TypeAlias = Union[str, _StrReps]
+_StrRepOrReps: TypeAlias = str | _StrReps
 """
 _StrRepOrReps is a type alias for either a sequence of string representation(s) or a single string
 representation.
 """
 
-_EnumToStrRepMap: TypeAlias = Mapping[EnumType, str]
-"""
-_EnumToStrRepMap is a type alias for a mapping of Enum members to their single string
-representations.
-"""
-
-_EnumToStrRepsMap: TypeAlias = Mapping[EnumType, _StrReps]
-"""
-_EnumToStrRepsMap is a type alias for a mapping of Enum members to their sequences of string
-representations.
-"""
-
-_EnumToStrRepOrRepsMap: TypeAlias = Mapping[EnumType, Union[str, _StrReps]]
+_EnumToStrRepOrRepsMap: TypeAlias = Mapping[EnumType, str] | Mapping[EnumType, _StrReps]
 """
 _EnumToStrRepOrRepsMap is a type alias for a mapping of Enum members to either a single string
 representation or a sequence of string representation(s).
@@ -160,30 +156,136 @@ _Vs = TypeVar("_Vs", bound=Iterable[_V])
 _M  = TypeVar("_M", bound=Mapping[_K, _V])
 """Mapping type variable for mappings with keys of type _K and values of type _V."""
 
-def _assert_keys(
-    map:           _M,
-    excluded_keys: _Ks = (None),
-    description:   Optional[str] = None
+def _assert_enum_exists(
+    enum:     EnumType,
+    str_reps: Optional[StrRepOrReps] = None
     ) -> None:
     """
-    Check that the mapping is not empty and does not contain any excluded keys.
+    Assert that the Enum member exists and is not None.
+    Args:
+        enum:     The Enum member to check.
+        str_reps: Optional sequence of string representation(s) for the Enum member.
+        
+    Raises:
+        AssertionError: If the Enum member is None.
+    """
+    assert enum is not None, \
+        "The Enum must not be None." if str_reps is None else \
+            f"The Enum must not be None. \
+            Please provide a valid Enum member with corresponding string representation(s) \
+            ({str_reps!r})."
+
+def _assert_keys(
+    map:           _M,
+    description:   Optional[str] = None,
+    *,
+    allow_none:    bool = False,
+    allow_empty:   bool = False,
+    included_keys: _Ks = UNSET,
+    excluded_keys: _Ks = UNSET,
+    ) -> None:
+    """
+    Check that the mapping is not empty, and if specified, that it contains the included keys
+    and/or does not contain the excluded keys.
 
     Args:
         map:           A mapping of keys to values.
-        excluded_keys: An iterable of keys that should not be present in the mapping.
         description:   Optional description of the mapping for error messages.
+        included_keys: An iterable of keys that should be present in the mapping.
+        excluded_keys: An iterable of keys that should not be present in the mapping.
 
     Raises:
-        AssertionError: If the mapping is empty or contains any of the excluded keys.
+        AssertionError: If the mapping is empty or includes/excludes keys that do not match the
+            specified conditions.
     """
     description = description or type(map).__name__
     keys_type = type(next(iter(map.keys())))
 
-    assert map, f"The {description} is empty or None."
+    assert map is not None, f"The {description} must not be None."
 
-    for key in excluded_keys:
-        assert key not in map, \
-            f"The {description} must not contain the key ({keys_type!r}): {key!r}."
+    assert map != {}, f"The {description} must not be empty."
+
+    if included_keys is not UNSET:
+        for key in included_keys:
+            assert key in map, \
+                f"The {description} must contain the key ({keys_type!r}): {key!r}."
+
+    if excluded_keys is not UNSET:
+        for key in excluded_keys:
+            assert key not in map, \
+                f"The {description} must not contain the key ({keys_type!r}): {key!r}."
+
+def _assert_not_empty(
+    collection:  Iterable,
+    description: Optional[str] = None
+    ) -> None:
+    """
+    Assert that the collection is not empty.
+
+    Args:
+        collection:  An iterable collection to check.
+        description: Optional description of the sequence for error messages.
+
+    Raises:
+        AssertionError: If the collection is empty or None.
+    """
+    assert collection is not None, \
+        f"The collection must not be None." if description is None else \
+        f"The {description} must not be None."
+    description = description or type(collection).__name__
+    assert collection, \
+        f"The {description} must not be empty."
+
+def _assert_lengths_match(
+    enums:         Sequence[EnumType],
+    str_reps_list: Sequence[_StrRepOrReps]
+    ) -> None:
+    """
+    Assert that the lengths of the enums and string representation(s) sequences match.
+
+    Args:
+        enums:         A sequence of Enum members.
+        str_reps_list: A sequence of string representation(s).
+
+    Raises:
+        AssertionError: If the lengths of the enums and string representation(s) sequences do not
+            match.
+    """
+    _assert_not_empty(enums, "enums")
+    _assert_not_empty(str_reps_list, "string representation(s)")
+    assert len(enums) == len(str_reps_list), \
+        f"The length of enums [{len(enums)}] and \
+            string representation(s) [{len(str_reps_list)}] \
+            must be the same for mapping between enums and strings.\n \
+            Enums:   {type(next(iter(enums)))!r}::{enums!r}\n \
+            Strings: {str_reps_list!r}"
+
+def _assert_str_reps_exist(
+    str_reps: _StrRepOrReps,
+    enum:     Optional[EnumType] = None
+    ) -> None:
+    """
+    Assert that the string representation(s) exist and are not empty or None.
+
+    Args:
+        str_reps: A sequence of string representation(s) for the Enum member.
+        enum: Optional Enum member for logging purposes.
+
+    Raises:
+        AssertionError: If any of the following conditions are met:
+            *   the sequence of string representation(s) is empty or None
+            *   any string representation is empty
+    """
+    assert str_reps, \
+        f"Enum member {enum!r} has no string representation(s)." if enum else \
+        "The sequence of string representation(s) for an Enum is empty or None."
+    if isinstance(str_reps, Sequence):
+        for str_rep in str_reps:
+            assert str_rep, \
+                f"Empty string found for enum member {enum!r} in string representation(s) \
+                    {str_reps!r}." \
+                    if enum else \
+                f"Empty string found in string representation(s) {str_reps!r}."
 
 def _assert_valid_enum_keys(enum_to_str_reps_map: _EnumToStrRepOrRepsMap[EnumType]) -> None:
     """
@@ -213,73 +315,27 @@ def _assert_valid_str_keys(str_rep_to_enum_map: _StrRepToEnumMap[EnumType]) -> N
     """
     _assert_keys(str_rep_to_enum_map, excluded_keys=("", None), description="StrRepToEnumDict")
 
-def _assert_valid_enum_keys(enum_to_str_reps_map: _EnumToStrRepOrRepsMap[EnumType]) -> None:
-    """
-    Check that the enum-to-string representation(s) mapping does not contain any `None` Enum members.
-    Also check that the mapping is not empty.
-
-    Args:
-        enum_to_str_reps_map: A map of Enum members to their string representation(s).
-
-    Raises:
-        AssertionError: If any `Enum` member is None, or if the map is empty.
-    """
-    assert enum_to_str_reps_map, \
-        "EnumToStrRepsDict is empty. Please provide a valid mapping of Enum members to their \
-            string representation(s)."
-    assert None not in enum_to_str_reps_map, \
-        f"EnumToStrRepsDict contains None as a key. \
-            ({type(next(iter(enum_to_str_reps_map.keys())))!r}[None]:: \
-            {enum_to_str_reps_map[None]!r})"
-
-def _assert_enum_exists(
+def _assert_enum_and_str_reps_exist(
     enum:     EnumType,
-    str_reps: Optional[StrRepOrReps] = None
+    str_reps: Optional[_StrRepOrReps] = None
     ) -> None:
     """
-    Assert that the Enum member exists and is not None.
+    Assert that the Enum member and its string representation(s) exist and are not None or empty.
+    
     Args:
         enum:     The Enum member to check.
-        str_reps: Optional sequence of string representation(s) for the Enum member.
+        str_reps: Sequence of (or single) string representation(s) for the Enum member.
         
     Raises:
-        AssertionError: If the Enum member is None.
-    """
-    assert enum is not None, \
-        f"Enum ({type(enum)!r}) is None. \
-            Please provide a valid Enum member." if str_reps is None else \
-        f"Enum member ({trype(enum)!r}) is None. \
-            Please provide a valid Enum member with corresponding string representation(s) \
-            ({str_reps!r})."
-
-def _assert_str_reps_exist(
-    str_reps: _StrRepOrReps,
-    enum:     Optional[EnumType] = None
-    ) -> None:
-    """
-    Assert that the string representation(s) exist and are not empty or None.
-
-    Args:
-        str_reps: A sequence of string representation(s) for the Enum member.
-        enum: Optional Enum member for logging purposes.
-
-    Raises:
         AssertionError: If any of the following conditions are met:
+            *   the Enum member is None
             *   the sequence of string representation(s) is empty or None
             *   any string representation is empty
     """
-    assert str_reps, \
-        f"Enum member {enum!r} has no string representation(s)." if enum else \
-        "The sequence of string representation(s) for an Enum is empty or None."
-    if isinstance(str_reps, Sequence):
-        for str_rep in str_reps:
-            assert str_rep, \
-                f"Empty string found for enum member {enum!r} in string representation(s) \
-                    {str_reps!r}." \
-                    if enum else \
-                f"Empty string found in string representation(s) {str_reps!r}."
+    _assert_enum_exists(enum, str_reps)
+    _assert_str_reps_exist(str_reps, enum)
 
-def assert_str_reps_valid(
+def _assert_str_reps_valid(
     str_reps:    _StrRepOrReps,
     enum:        Optional[EnumType] = None,
     description: Optional[str]      = None
@@ -308,88 +364,6 @@ def assert_str_reps_valid(
                     if enum is None and description is not None else \
                 f"Empty string found in string representation(s) {str_reps!r} for {description} \
                     ({enum!r})."
-
-def assert_enum_and_str_reps_exist(
-    enum:     EnumType,
-    str_reps: Optional[_StrRepOrReps] = None
-    ) -> None:
-    """
-    Assert that the Enum member and its string representation(s) exist and are not None or empty.
-    
-    Args:
-        enum:     The Enum member to check.
-        str_reps: Sequence of (or single) string representation(s) for the Enum member.
-        
-    Raises:
-        AssertionError: If any of the following conditions are met:
-            *   the Enum member is None
-            *   the sequence of string representation(s) is empty or None
-            *   any string representation is empty
-    """
-    _assert_enum_exists(enum, str_reps)
-    _assert_str_reps_exist(str_reps, enum)
-
-def assert_enum_and_str_reps_valid(
-    enum:     EnumType,
-    str_reps: _StrRepOrReps,
-    description: Optional[str] = None
-    ) -> None:
-    """
-    Assert that the Enum member and its string representation(s) are valid.
-    Args:
-        enum:        The Enum member to check.
-        str_reps:    A sequence of string representation(s) for the Enum member.
-        description: Optional description of the Enum member for error messages.
-    Raises:
-        AssertionError: If any of the following conditions are met:
-            *   the Enum member is None
-            *   the sequence of string representation(s) is empty or None
-            *   any string representation is empty
-    """
-    assert_enum_and_str_reps_exist(enum, str_reps)
-    assert_str_reps_valid(str_reps, enum, description)
-
-def _assert_not_empty(
-    collection:  Iterable,
-    description: Optional[str] = None
-    ) -> None:
-    """
-    Assert that the collection is not empty.
-    
-    Args:
-        collection:  An iterable collection to check.
-        description: Optional description of the sequence for error messages.
-        
-    Raises:
-        AssertionError: If the collection is empty or None.
-    """
-    assert collection, \
-        f"The {type(collection).__name__} is empty." if description is None else \
-        f"The {description} is empty or None. Please provide a valid {type(collection).__name__}."
-
-def _assert_lengths_match(
-    enums:         Sequence[EnumType],
-    str_reps_list: Sequence[_StrRepOrReps]
-    ) -> None:
-    """
-    Assert that the lengths of the enums and string representation(s) sequences match.
-
-    Args:
-        enums:         A sequence of Enum members.
-        str_reps_list: A sequence of string representation(s).
-
-    Raises:
-        AssertionError: If the lengths of the enums and string representation(s) sequences do not
-            match.
-    """
-    _assert_not_empty(enums, "enums")
-    _assert_not_empty(str_reps_list, "string representation(s)")
-    assert len(enums) == len(str_reps_list), \
-        f"The length of enums [{len(enums)}] and \
-            string representation(s) [{len(str_reps_list)}] \
-            must be the same for mapping between enums and strings.\n \
-            Enums:   {type(next(iter(enums)))!r}::{enums!r}\n \
-            Strings: {str_reps_list!r}"
 
 def _process_enum_set(
     enum:                  EnumType,
@@ -422,7 +396,7 @@ def _process_enum_set(
             *   the Enum or string representation(s) have already been added to the
                 `str_rep_to_enum_dict` or `enum_to_str_reps_dict`.
     """
-    assert_enum_and_str_reps_exist(enum, str_reps)
+    _assert_enum_and_str_reps_exist(enum, str_reps)
 
     for string in str_reps:
         assert string not in str_rep_to_enum_dict, \
@@ -433,6 +407,30 @@ def _process_enum_set(
         assert enum not in enum_to_str_reps_dict, \
             f"Duplicate enum {enum!r} found in enum_to_str_reps_dict."
         enum_to_str_reps_dict[enum] = tuple(str_reps)
+
+assert_enum_and_str_reps_exist = _assert_enum_and_str_reps_exist
+
+def assert_enum_and_str_reps_valid(
+    enum:        EnumType,
+    str_reps:    _StrRepOrReps,
+    description: Optional[str] = None
+    ) -> None:
+    """
+    Assert that the Enum member and its string representation(s) are valid.
+    Args:
+        enum:        The Enum member to check.
+        str_reps:    A sequence of string representation(s) for the Enum member.
+        description: Optional description of the Enum member for error messages.
+    Raises:
+        AssertionError: If any of the following conditions are met:
+            *   the Enum member is None
+            *   the sequence of string representation(s) is empty or None
+            *   any string representation is empty
+    """
+    _assert_enum_and_str_reps_exist(enum, str_reps)
+    _assert_str_reps_valid(str_reps, enum, description)
+
+assert_str_reps_valid = _assert_str_reps_valid
 
 @Overload
 def make_enum_to_strings_dict(
@@ -585,7 +583,6 @@ def make_enum_to_strings_dict(
 
     return enum_to_str_reps_dict
 
-
 @Overload
 def make_string_to_enum_dict(
     enum_to_str_reps_map: Mapping[EnumType, Sequence[str]],
@@ -708,7 +705,7 @@ def make_enum_and_str_rep_dicts(
         AssertionError: If the Enum class is not valid or does not have string representation(s).
     """
     enum_to_str_reps_dict: EnumToStrRepsDict[EnumType] = {}
-    str_rep_to_enum_dict:  StrRepToEnumDict[EnumType]     = {}
+    str_rep_to_enum_dict:  StrRepToEnumDict[EnumType]  = {}
 
     for enum in enum_class:
         if isinstance(enum.value, Sequence) and isinstance(next(iter(enum.value), None), str):
@@ -747,4 +744,3 @@ def make_enum_and_str_rep_dicts(
     Raises:
         AssertionError: If the Enum class is not valid or does not have string representation(s).
     """
-    make

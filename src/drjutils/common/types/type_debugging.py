@@ -1,5 +1,5 @@
 """
-# unset.py
+# type_debugging.py
 
 ## drjutils.common.types
 
@@ -14,9 +14,9 @@ and setting names and docstrings for objects.
 
 ## Methods:
 
-- `set_name`: Set the name of an object if it has a `__name__` attribute.
-- `set_name_if`: Conditionally set the name of an object if it has a `__name__` attribute.
-- `set_docstring`: Set the docstring of an object if it has a `__doc__` attribute.
+- `set_debug_name`: Set the debug name of an object if it has a `_debug_name` attribute.
+- `set_debug_context`: Conditionally set the name of an object if it has a `__name__` attribute.
+- `set_debug_name_and_context`: Set the docstring of an object if it has a `__doc__` attribute.
 - `set_docstring_if`: Conditionally set the docstring of an object if it has a `__doc__` attribute.
 - `set_name_and_doc`: Set both the name and docstring of an object if applicable.
 - `set_name_and_doc_if`: Conditionally set the name and docstring of an object.
@@ -30,37 +30,26 @@ Standard Libraries
 from typing import Callable, Final, Optional
 from typing_extensions import TypeVar
 
+from drjutils.common.types.sentinel import Opt, OptOrNone, OrNone, UNSET, resolve
+
+resolve()
+
 __all__ = [
-    "T",
-    "set_name",
-    "set_name_if",
-    "set_docstring",
-    "set_docstring_if",
-    "set_name_and_doc",
-    "set_name_and_doc_if",
+    "_T",
+    "set_debug_name",
+    "set_debug_context",
+    "set_debug_name_and_context",
 ]
 
 
-UNSET: Final = object()
-T = TypeVar("T")
-R = TypeVar("R")
-
-def resolved(
-    value:   T | object,
-    default: R | Callable[[], R]
-    ) -> T | R:
-    return default() if value is UNSET and callable(default) else \
-           default  if value is UNSET else \
-           value
-
-T = TypeVar("T", bound=object)
-"""Type variable for generic objects."""
+_T = TypeVar("T")
+_R = TypeVar("R")
 
 def set_debug_name(
-    obj:        T,
-    debug_name: str,
-    condition:  Optional[bool] = True,
-    ) -> T:
+    obj:        _T,
+    debug_name: OptOrNone[str] = UNSET,
+    condition:  OrNone[bool]   = None,
+    ) -> _T:
     """
     Set the debug name of an object.
 
@@ -74,15 +63,17 @@ def set_debug_name(
     Returns:
         The object with the debug name set, if applicable.
     """
+    assert obj, "Object must not be None to set a debug name."
+    assert debug_name is not UNSET, "Debug name must be provided to set a debug name."
     if condition:
         obj._debug_name = debug_name
     return obj
 
 def set_debug_context(
-    obj:       T,
-    debug_ctx: str,
-    condition: Optional[bool] = True,
-    ) -> T:
+    obj:       _T,
+    debug_ctx: OptOrNone[str] = UNSET,
+    condition: OrNone[bool]   = None,
+    ) -> _T:
     """
     Set the debug context of an object.
 
@@ -96,20 +87,24 @@ def set_debug_context(
     Returns:
         The object with the debug context set, if applicable.
     """
+    assert obj, "Object must not be None to set a debug context."
     if condition:
         obj._debug_context = debug_ctx
     return obj
 
 def set_debug_name_and_context(
-    obj:        T,
-    debug_name: Optional[str]  = Unini,
-    context:    Optional[str]  = None,
-    condition:  Optional[bool] = True,
-    ) -> T:
+    obj:        _T,
+    /, *,
+    debug_name: OptOrNone[str]  = UNSET,
+    context:    OptOrNone[str]  = UNSET,
+    condition:  OrNone[bool]    = None,
+    ) -> _T:
     """
     Set both the debug name and context of an object.
 
     This is useful for debugging and logging purposes.
+
+    At least one of debug_name or context must be provided.
 
     Args:
         obj:        The object to set the debug name and context for
@@ -120,10 +115,11 @@ def set_debug_name_and_context(
     Returns:
         The object with the debug name and context set, if applicable.
     """
+    assert obj, "Object must not be None to set a debug name and/or context."
+    assert debug_name is not UNSET or context is not UNSET, "At least one of debug_name or context \
+        must be provided."
     if condition:
-        if debug_name is not None:
-            obj._debug_name = debug_name
-        if context is not None:
+        if debug_name is not UNSET:
+            obj._debug_name    = debug_name
+        if context    is not UNSET:
             obj._debug_context = context
-
-

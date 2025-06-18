@@ -7,7 +7,7 @@
 
 This module defines a base class for creating enums with string aliases.
 
-## Class: EnumMap
+## Class: MappedEnum
 
 This class is a base class for mapping enum members to string representations.
 It is intended for the use case where there are a relatively small number of string variations
@@ -19,9 +19,9 @@ If a much broader set of string variations is needed, consider using `EnumRegex`
 
 ```python
 from typing import Final, Tuple
-from drjutils.common.enums import EnumMap
+from drjutils.common.enums import MappedEnum
 
-class MyEnumMap(EnumMap):
+class MyMappedEnum(MappedEnum):
     BMP:  Final[Tuple[str, ...]] = ("BMP",  "bmp", "Bitmap")
     PNG:  Final[Tuple[str, ...]] = ("PNG",  "png")
     JPEG: Final[Tuple[str, ...]] = ("JPEG", "jpeg")
@@ -31,20 +31,23 @@ class MyEnumMap(EnumMap):
 Copyright 2025 Daniel Robert Jackson
 """
 
+# TODO: Clean up imports once this module is done.
+
 """
 Standard Libraries
 """
 from enum   import Enum
-from typing import  Optional, Self, Union
+from typing import  Optional, Self
 
 """
 Project Libraries
 """
 from .enum_utils import (
     EnumType,
-    StrReps,
     EnumToStrRepsDict,
-    StrToEnumDict,
+    StrReps,
+    StrRepOrReps,
+    StrRepToEnumDict,
     assert_enum_and_str_reps_exist,
     assert_enum_and_str_reps_valid,
     assert_str_reps_valid,
@@ -52,14 +55,15 @@ from .enum_utils import (
     make_string_to_enum_dict,
     make_enum_and_str_rep_dicts,
 )
+from drjutils.common.types.sentinel import UNSET
 
 __all__ = [
-    "EnumMap"
+    "MappedEnum"
 ]
 
-class EnumMap(Enum):
+class MappedEnum(Enum):
     """
-    # Class: EnumMap
+    # Class: MappedEnum
 
     This class is a base class for mapping enum members to string representations.
     It is intended for the use case where there are a relatively small number of string variations
@@ -82,9 +86,9 @@ class EnumMap(Enum):
 
     ```python
     from typing import Final, Tuple
-    from drjutils.common import EnumMap
+    from drjutils.common import MappedEnum
 
-    class MyEnumMap(EnumMap):
+    class MyMappedEnum(MappedEnum):
         BMP:  Final[Tuple[str, ...]] = ("BMP",  "bmp", "Bitmap")
         PNG:  Final[Tuple[str, ...]] = ("PNG",  "png")
         JPEG: Final[Tuple[str, ...]] = ("JPEG", "jpeg")
@@ -99,10 +103,10 @@ class EnumMap(Enum):
     *Enums and strings ordered by preference*
     """
 
-    _STRINGS_TO_ENUMS: StrToEnumDict[Self]
+    _STRINGS_TO_ENUMS: StrRepToEnumDict[Self]
     """Mapping of all string representations to their corresponding Enum members."""
 
-    def __new__(cls, value: Union[StrReps, str]) -> Self:
+    def __new__(cls, value: StrRepOrReps) -> Self:
         """
         Create a new instance of the enum with the given string representations.
 
@@ -121,10 +125,17 @@ class EnumMap(Enum):
         assert_str_reps_valid(value, Self)
 
         obj = object.__new__(cls)
-        obj._value_ = value
+
+        if isinstance(value, str):
+            # If a single string is provided, convert it to a tuple for consistency.
+            obj._value_  = value
+            obj.str_reps = (value,)  # Store the single string as a tuple.
+        elif not isinstance(value, tuple):
+            obj._value_  = value[0] # The first string is the primary value of the enum member.
+            obj.str_reps = value   # Store all string representations for the enum member.
 
         # Use the subclass-specific display string.
-        obj._display_ = value[0]
+        obj._display_ = obj._value_
 
         return obj
 
@@ -138,6 +149,17 @@ class EnumMap(Enum):
             The display string of the enum member as defined in the subclass.
         """
         return self._display_
+
+    def get_str_reps(self) -> StrReps:
+        """
+        Get the string representations of the enum member.
+
+        This method returns the tuple of strings that represent the enum member.
+
+        Returns:
+            A tuple of strings representing the enum member.
+        """
+        return self._str_reps
 
     @classmethod
     def __init_subclass__(cls) -> None:
@@ -161,20 +183,21 @@ class EnumMap(Enum):
         cls._ENUMS_TO_STRINGS, cls._STRINGS_TO_ENUMS = make_enum_and_str_rep_dicts(cls)
 
     @classmethod
-    def is_valid(cls, string: str) -> bool:
+    def is_valid_str(cls, string: str, self = None) -> bool:
         """
-        Check if the given string is a valid representation of either True or False.
-        This method checks if the string is in the combined mapping of True and False values
-        defined in the subclass. It ignores leading and trailing whitespace.
-        It is case-sensitive.
+        Check if the given string is a valid representation of an enum member.
+        This method checks if the provided string matches any of the string representations
+        defined for the enum member.
 
         Args:
             string: The string to check.
+            self:   Optional; if provided, checks against the string representations of this
+                    specific enum member.
 
         Returns:
-            bool: True if the string is a valid representation of either True or False, False otherwise.
+            bool: True if the string is a valid representation of an enum member, False otherwise.
         """
-        return string.strip() in cls._ALL_BOOL_MAP
+        return string in (cls._STRINGS_TO_ENUMS if self is None else cls._ENUMS_TO_STRINGS[self]._STRINGS_TO_ENUMS)
 
     @classmethod
     def maybe_from_str(cls, string: str) -> Optional[Self]:
@@ -194,21 +217,6 @@ class EnumMap(Enum):
             return cls._get_false_member()
         else:
             return None
-
-    @classmethod
-    def maybe_bool_from_str(cls, string: str) -> Optional[bool]:
-        """
-        Attempts to convert a string to a boolean value based on predefined mappings.
-
-        Args:
-            string (str): The input string to convert.
-
-        Returns:
-            Optional[bool]: The corresponding boolean value if the string matches a known alias,
-            otherwise None.
-        """
-        bool_enum = cls.maybe_from_str(string)
-        return bool_enum.value if bool_enum is not None else None
 
     @classmethod
     def from_str(cls, string: str) -> Self:
@@ -231,62 +239,3 @@ class EnumMap(Enum):
         if result is None:
             raise ValueError(f"Invalid Boolean value: {string}")
         return result
-
-    @classmethod
-    def bool_from_str(cls, string: str) -> bool:
-        """
-        Converts a string to a boolean value.
-
-        Attempts to interpret the given string as a boolean. If the string cannot be
-        interpreted as a boolean, raises a ValueError.
-
-        Args:
-            string (str): The string to convert to a boolean.
-
-        Returns:
-            bool: The boolean value corresponding to the input string.
-
-        Raises:
-            ValueError: If the input string cannot be interpreted as a boolean.
-        """
-        result = cls.maybe_bool_from_str(string)
-        if result is None:
-            raise ValueError(f"Invalid Boolean value: {string}")
-        return result
-
-    @classmethod
-    def _get_true_member(cls) -> Self:
-        """
-        Returns the enum member whose value is True.
-
-        Iterates over all members of the class and returns the first member with a value of True.
-
-        Returns:
-            Self: The enum member with value True.
-
-        Raises:
-            NotImplementedError: If no member with value True is defined in the subclass.
-        """
-        for member in cls:
-            if member.value is True:
-                return member
-        raise NotImplementedError("True member not defined in subclass")
-
-    @classmethod
-    def _get_false_member(cls) -> Self:
-        """
-        Returns the enum member whose value is False.
-
-        Iterates through the members of the class and returns the first member
-        with a value of False. Raises a ValueError if no such member is found.
-
-        Returns:
-            BooleanAlias: The enum member with value False.
-
-        Raises:
-            ValueError: If no member with value False is defined in the subclass.
-        """
-        for member in cls:
-            if member.value is False:
-                return member
-        raise ValueError("False member not defined in subclass")

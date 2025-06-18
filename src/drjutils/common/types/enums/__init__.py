@@ -7,7 +7,7 @@ This module provides utilities for working with enumerations in Python.
 
 ## Classes
 
-- `EnumMap`: A class for mapping enum values to their names and vice versa.
+- `MappedEnum`: A class for mapping enum values to their names and vice versa.
 
 ## Data Types
 - `EnumType`:          Type variable for any enum type.
@@ -30,12 +30,11 @@ This module provides utilities for working with enumerations in Python.
 Copyright 2025 Daniel Robert Jackson
 """
 
-from enum_map  import EnumMap
 from enum_utils import (
     EnumType,
     StrReps,
     EnumToStrRepsDict,
-    StrToEnumDict,
+    StrRepToEnumDict,
     assert_enum_and_str_reps_exist,
     assert_enum_and_str_reps_valid,
     assert_str_reps_valid,
@@ -43,6 +42,8 @@ from enum_utils import (
     make_string_to_enum_dict,
     make_enum_and_str_rep_dicts,
     )
+from mapped_enum  import MappedEnum
+
 
 __all__ = [
     # Classes
@@ -51,7 +52,7 @@ __all__ = [
     "EnumType",
     "StrReps",
     "EnumToStrRepsDict",
-    "StrToEnumDict",
+    "StrRepToEnumDict",
     # Utility Functions
     "assert_enum_and_str_reps_exist",
     "assert_enum_and_str_reps_valid",

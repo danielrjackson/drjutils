@@ -15,6 +15,8 @@ from .sentinel import (
     Opt,
     OptOrNone,
     OrNone,
+    Req,
+    ReqOrNone,
     # methods
     default_factory,
     require,
