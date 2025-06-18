@@ -106,7 +106,7 @@ class MappedEnum(Enum):
     _STRINGS_TO_ENUMS: StrRepToEnumDict[Self]
     """Mapping of all string representations to their corresponding Enum members."""
 
-    def __new__(cls, value: StrRepOrReps) -> Self:
+    def __new__(cls, *value: str) -> Self:
         """
         Create a new instance of the enum with the given string representations.
 
@@ -122,14 +122,13 @@ class MappedEnum(Enum):
         Raises:
             ValueError: If the value is empty or does not contain valid strings.
         """
-        assert_str_reps_valid(value, Self)
+        reps = value
+        if len(reps) == 1 and isinstance(reps[0], (tuple, list)):
+            reps = tuple(reps[0])
+
+        assert_str_reps_valid(reps, Self)
 
         obj = object.__new__(cls)
-
-        if isinstance(value, str):
-            reps = (value,)
-        else:
-            reps = tuple(value)
 
         obj._value_ = reps[0]
         obj._str_reps = reps

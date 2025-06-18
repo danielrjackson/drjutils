@@ -708,10 +708,12 @@ def make_enum_and_str_rep_dicts(
     str_rep_to_enum_dict:  StrRepToEnumDict[EnumType]  = {}
 
     for enum in enum_class:
-        if isinstance(enum.value, Sequence) and isinstance(next(iter(enum.value), None), str):
-            str_reps = enum.value
+        if hasattr(enum, "_str_reps"):
+            str_reps = enum._str_reps  # type: ignore[attr-defined]
         elif isinstance(enum.value, str):
-            str_reps = (enum.name,)
+            str_reps = (enum.value,)
+        elif isinstance(enum.value, Sequence) and isinstance(next(iter(enum.value), None), str):
+            str_reps = tuple(enum.value)
         else:
             raise AssertionError(
                 f"Enum {enum!r} has an invalid value type: {type(enum.value)!r}. "
