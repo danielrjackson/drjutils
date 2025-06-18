@@ -15,6 +15,7 @@ DRJ Utils is a collection of utilities designed to simplify common tasks in Pyth
 - [Configuration Utilities](config/README.md): Documentation for the configuration utilities
 - [Logging Utilities](log/README.md): Documentation for the logging utilities
 - [Common Utilities](common/README.md): Documentation for the common utilities
+- [Developer Notes](notes/README.md): Internal notes on changes and lessons learned
 
 ## Installation
 
