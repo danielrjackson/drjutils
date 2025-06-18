@@ -7,7 +7,10 @@ from typing import Union
 # Regular expressions for different numeric formats
 flt_bsc_rgx = re.compile(r"^\s*[+-]?((\d*\.\d+)|(\d+\.\d*))\s*$")
 flt_rgx = re.compile(r"^\s*[+-]?(?:\d*\.\d+|\d+\.\d*|\d+(?:\.\d*)?[eE][+-]?\d+|inf(?:inity)?|nan)\s*$", re.IGNORECASE)
-int_bas_rgx = re.compile(r"^\s*[+-]?(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+)\s*$", re.IGNORECASE)
+int_bas_rgx = re.compile(
+    r"^\s*[+-]?(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+|\d+)\s*$",
+    re.IGNORECASE,
+)
 int_bsc_rgx = re.compile(r"^\s*[+-]?\d+\s*$")
 int_rgx = re.compile(r"^\s*[+-]?(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+|\d+)\s*$", re.IGNORECASE)
 num_rgx = re.compile(r"^(?:" + flt_rgx.pattern[1:-1] + "|" + int_rgx.pattern[1:-1] + ")$", re.IGNORECASE)
