@@ -28,19 +28,25 @@ Copyright 2025 Daniel Robert Jackson
 Standard Libraries
 """
 from typing import Optional
-from typing_extensions import TypeAlias, TypeAliasType, TypeVar
+from collections.abc import Collection
+from typing_extensions import TypeAlias, TypeVar
 
 """
 Package Libraries
 """
-from drjutils.common.types.type_utils import (
-    T,
-    set_name, set_name_if,
-    set_docstring, set_docstring_if,
-    set_name_and_doc, set_name_and_doc_if,
-    )
+# These utilities provide simple helpers for assigning names and docstrings
+# to objects at runtime. They intentionally do not rely on any additional
+# modules so that this file can stand on its own.
 
 __all__ = [
+    "T",
+    "Many",
+    "set_name",
+    "set_name_if",
+    "set_docstring",
+    "set_docstring_if",
+    "set_name_and_doc",
+    "set_name_and_doc_if",
 ]
 
 T = TypeVar("T")

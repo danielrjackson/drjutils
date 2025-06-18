@@ -22,12 +22,14 @@ from .sentinel import (
     require,
     resolve,
 )
-from .type_utils  import (
-    T, Many, OneOrMany,
+from .type_checks import (
+    T,
+    Many,
     set_name, set_name_if,
     set_docstring, set_docstring_if,
     set_name_and_doc, set_name_and_doc_if,
-    )
+)
+from .collections.collection_utils import OneOrMany
 
 __all__ = [
     # sentinel

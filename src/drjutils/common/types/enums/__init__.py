@@ -30,7 +30,7 @@ This module provides utilities for working with enumerations in Python.
 Copyright 2025 Daniel Robert Jackson
 """
 
-from enum_utils import (
+from .enum_utils import (
     EnumType,
     StrReps,
     EnumToStrRepsDict,
@@ -42,12 +42,11 @@ from enum_utils import (
     make_string_to_enum_dict,
     make_enum_and_str_rep_dicts,
     )
-from mapped_enum  import MappedEnum
+from .mapped_enum  import MappedEnum
 
 
 __all__ = [
     # Classes
-    "EnumMap",
     # Data Types
     "EnumType",
     "StrReps",
@@ -61,3 +60,4 @@ __all__ = [
     "make_string_to_enum_dict",
     "make_enum_and_str_rep_dicts"
 ]
+

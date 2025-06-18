@@ -30,9 +30,7 @@ Standard Libraries
 from typing import Callable, Final, Optional
 from typing_extensions import TypeVar
 
-from drjutils.common.types.sentinel import Opt, OptOrNone, OrNone, UNSET, resolve
-
-resolve()
+from drjutils.common.types.sentinel import Opt, OptOrNone, OrNone, UNSET
 
 __all__ = [
     "_T",
@@ -120,6 +118,7 @@ def set_debug_name_and_context(
         must be provided."
     if condition:
         if debug_name is not UNSET:
-            obj._debug_name    = debug_name
-        if context    is not UNSET:
+            obj._debug_name = debug_name
+        if context is not UNSET:
             obj._debug_context = context
+    return obj
