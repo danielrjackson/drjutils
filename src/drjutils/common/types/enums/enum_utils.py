@@ -52,8 +52,8 @@ Standard Libraries
 from collections import defaultdict
 from collections.abc import Iterable
 from enum   import Enum
-from typing import Mapping, Optional, Sequence
-from typing_extensions import Overload, TypeAlias, TypeVar
+from typing import Mapping, Optional, Sequence, Union
+from typing_extensions import overload, TypeAlias, TypeVar
 
 """
 Project Libraries
@@ -432,7 +432,7 @@ def assert_enum_and_str_reps_valid(
 
 assert_str_reps_valid = _assert_str_reps_valid
 
-@Overload
+@overload
 def make_enum_to_strings_dict(
     enum_to_str_reps_map:  Mapping[EnumType, Sequence[str]]
     ) -> EnumToStrRepsDict[EnumType]:
@@ -463,7 +463,7 @@ def make_enum_to_strings_dict(
 
     return enum_to_str_reps_dict
 
-@Overload
+@overload
 def make_enum_to_strings_dict(
     enum_to_str_reps_pairs: Sequence[tuple[EnumType, _StrReps]],
     enum_to_str_reps_dict:  Optional[EnumToStrRepOrRepsDict[EnumType]] = {}
@@ -500,7 +500,7 @@ def make_enum_to_strings_dict(
 
     return enum_to_str_reps_dict
 
-@Overload
+@overload
 def make_enum_to_strings_dict(
     enums:                 Sequence[EnumType],
     str_reps_list:         Sequence[Sequence[str]],
@@ -539,7 +539,7 @@ def make_enum_to_strings_dict(
 
     return enum_to_str_reps_dict
 
-@Overload
+@overload
 def make_enum_to_strings_dict(
     str_rep_to_enum_dict:  StrRepToEnumDict,
     enum_to_str_reps_dict: Optional[EnumToStrRepsDict[EnumType]] = {}
@@ -583,7 +583,7 @@ def make_enum_to_strings_dict(
 
     return enum_to_str_reps_dict
 
-@Overload
+@overload
 def make_string_to_enum_dict(
     enum_to_str_reps_map: Mapping[EnumType, Sequence[str]],
     str_rep_to_enum_dict: Optional[StrRepToEnumDict[EnumType]] = {}
@@ -614,7 +614,7 @@ def make_string_to_enum_dict(
         _process_enum_set(enum, strings, str_rep_to_enum_dict)
     return str_rep_to_enum_dict
 
-@Overload
+@overload
 def make_string_to_enum_dict(
     enum_to_str_reps_pairs: Sequence[tuple[Enum, Sequence[str]]],
     str_rep_to_enum_dict:   Optional[StrRepToEnumDict[EnumType]] = {}
@@ -646,7 +646,7 @@ def make_string_to_enum_dict(
         _process_enum_set(enum, strings, str_rep_to_enum_dict)
     return str_rep_to_enum_dict
 
-@Overload
+@overload
 def make_string_to_enum_dict(
     enums:                Sequence[Enum],
     str_reps_list:        Sequence[Union[Sequence[str], str]],
@@ -727,20 +727,3 @@ def make_enum_and_str_rep_dicts(
 
     return enum_to_str_reps_dict, str_rep_to_enum_dict
 
-def make_enum_and_str_rep_dicts(
-    enum_class: EnumType
-) -> tuple[EnumToStrRepsDict[EnumType], StrRepToEnumDict[EnumType]]:
-    """
-    Create both string-to-enum and enum-to-string representation(s) dictionaries.
-
-    Args:
-        enum_class: The Enum class to create the mappings for.
-
-    Returns:
-        A tuple containing:
-        -   A dictionary mapping string representation(s) to their corresponding Enum members.
-        -   A dictionary mapping Enum members to their tuple of string representation(s).
-
-    Raises:
-        AssertionError: If the Enum class is not valid or does not have string representation(s).
-    """

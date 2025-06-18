@@ -31,15 +31,14 @@ from collections import defaultdict
 from collections.abc import Iterable
 from enum   import Enum
 from typing import Collection, Hashable, Mapping, Optional, Sequence, Union
-from typing_extensions import Overload, TypeAlias, TypeVar
+from typing_extensions import overload, TypeAlias, TypeVar
 
-from drjutils.common.types.type_utils import (
+from ..type_checks import (
     T,
     set_name, set_name_if,
     set_docstring, set_docstring_if,
-    set_name_and_doc, set_name_and_doc_if
+    set_name_and_doc, set_name_and_doc_if,
 )
-
 __all__ = [
     # Assertion Functions
     "assert_enum_and_str_reps_exist",
@@ -58,6 +57,9 @@ Many: TypeAlias = Collection[T]
 
 OneOrMany: TypeAlias = Union[T, Many[T]]
 """Type variable for collections that can contain one or more items."""
+
+ValueOrValues: TypeAlias = OneOrMany[T]
+"""Value or collection of values."""
 
 Key = TypeVar("Key", bound=Hashable)
 """Key type variable for dictionaries."""
@@ -465,7 +467,7 @@ def assert_values(
             assert value not in map.values(), \
                 f"The {description} must not contain the value{values_type!r}: {value!r}."
 
-@Overload
+@overload
 def assert_contains(
     map:         Map,
     keys:        KeyOrKeys,

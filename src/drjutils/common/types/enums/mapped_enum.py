@@ -106,7 +106,7 @@ class MappedEnum(Enum):
     _STRINGS_TO_ENUMS: StrRepToEnumDict[Self]
     """Mapping of all string representations to their corresponding Enum members."""
 
-    def __new__(cls, value: StrRepOrReps) -> Self:
+    def __new__(cls, *value: str) -> Self:
         """
         Create a new instance of the enum with the given string representations.
 
@@ -122,20 +122,14 @@ class MappedEnum(Enum):
         Raises:
             ValueError: If the value is empty or does not contain valid strings.
         """
-        assert_str_reps_valid(value, Self)
+        reps = value
+        assert_str_reps_valid(reps, Self)
 
         obj = object.__new__(cls)
 
-        if isinstance(value, str):
-            # If a single string is provided, convert it to a tuple for consistency.
-            obj._value_  = value
-            obj.str_reps = (value,)  # Store the single string as a tuple.
-        elif not isinstance(value, tuple):
-            obj._value_  = value[0] # The first string is the primary value of the enum member.
-            obj.str_reps = value   # Store all string representations for the enum member.
-
-        # Use the subclass-specific display string.
-        obj._display_ = obj._value_
+        obj._value_ = tuple(reps)
+        obj._str_reps = obj._value_
+        obj._display_ = obj._value_[0]
 
         return obj
 
@@ -197,7 +191,9 @@ class MappedEnum(Enum):
         Returns:
             bool: True if the string is a valid representation of an enum member, False otherwise.
         """
-        return string in (cls._STRINGS_TO_ENUMS if self is None else cls._ENUMS_TO_STRINGS[self]._STRINGS_TO_ENUMS)
+        if self is None:
+            return string in cls._STRINGS_TO_ENUMS
+        return string in cls._ENUMS_TO_STRINGS[self]
 
     @classmethod
     def maybe_from_str(cls, string: str) -> Optional[Self]:
@@ -211,12 +207,7 @@ class MappedEnum(Enum):
             Optional[BooleanAlias]: Returns BooleanAlias.TRUE or BooleanAlias.FALSE if the string matches a known boolean alias,
             otherwise returns None.
         """
-        if cls.is_true(string):
-            return cls._get_true_member()
-        elif cls.is_false(string):
-            return cls._get_false_member()
-        else:
-            return None
+        return cls._STRINGS_TO_ENUMS.get(string)
 
     @classmethod
     def from_str(cls, string: str) -> Self:
@@ -237,5 +228,6 @@ class MappedEnum(Enum):
         """
         result = cls.maybe_from_str(string)
         if result is None:
-            raise ValueError(f"Invalid Boolean value: {string}")
+            raise ValueError(f"Invalid value: {string}")
         return result
+
