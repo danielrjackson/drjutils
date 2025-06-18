@@ -7,10 +7,10 @@ from typing import Union
 # Regular expressions for different numeric formats
 flt_bsc_rgx = re.compile(r"^\s*[+-]?((\d*\.\d+)|(\d+\.\d*))\s*$")
 flt_rgx = re.compile(r"^\s*[+-]?(?:\d*\.\d+|\d+\.\d*|\d+(?:\.\d*)?[eE][+-]?\d+|inf(?:inity)?|nan)\s*$", re.IGNORECASE)
-int_bas_rgx = re.compile(r"^\s*[+-]?\d+\s*$")
-int_bsc_rgx = int_bas_rgx
-int_rgx = re.compile(r"^\s*[+-]?(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+|\d+)\s*$")
-num_rgx = re.compile(r"^(?:" + flt_rgx.pattern[1:-1] + "|" + int_rgx.pattern[1:-1] + ")$")
+int_bas_rgx = re.compile(r"^\s*[+-]?(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+)\s*$", re.IGNORECASE)
+int_bsc_rgx = re.compile(r"^\s*[+-]?\d+\s*$")
+int_rgx = re.compile(r"^\s*[+-]?(?:0x[0-9a-fA-F]+|0b[01]+|0o[0-7]+|\d+)\s*$", re.IGNORECASE)
+num_rgx = re.compile(r"^(?:" + flt_rgx.pattern[1:-1] + "|" + int_rgx.pattern[1:-1] + ")$", re.IGNORECASE)
 sci_rgx = re.compile(r"^\s*[+-]?(?:\d+(?:\.\d*)?|\d*\.\d+)[eE][+-]?\d+\s*$")
 
 __all__ = [
@@ -45,7 +45,7 @@ def is_float_basic(value: str) -> bool:
 
 
 def is_basic_int(value: str) -> bool:
-    return int_bas_rgx.match(value) is not None
+    return int_bsc_rgx.match(value) is not None
 
 
 def is_float(value: str) -> bool:
@@ -53,7 +53,7 @@ def is_float(value: str) -> bool:
 
 
 def is_int(value: str) -> bool:
-    return int_rgx.match(value) is not None and not is_non_decimal(value.strip()) or int_bas_rgx.match(value) is not None
+    return int_rgx.match(value) is not None
 
 
 def is_non_decimal(value: str) -> bool:

@@ -123,8 +123,7 @@ class MappedEnum(Enum):
             ValueError: If the value is empty or does not contain valid strings.
         """
         reps = value
-        if len(reps) == 1 and isinstance(reps[0], (tuple, list)):
-            reps = tuple(reps[0])
+        assert_str_reps_valid(reps, Self)
 
         assert_str_reps_valid(reps, Self)
 
