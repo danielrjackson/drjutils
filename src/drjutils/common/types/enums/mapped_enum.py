@@ -1,7 +1,7 @@
 """
 # enum_map.py
 
-## drjutils.common.enums
+## drjutils.common.types.enums
 
 ## Summary
 
@@ -19,7 +19,7 @@ If a much broader set of string variations is needed, consider using `EnumRegex`
 
 ```python
 from typing import Final, Tuple
-from drjutils.common.enums import MappedEnum
+from drjutils.common.types.enums import MappedEnum
 
 class MyMappedEnum(MappedEnum):
     BMP:  Final[Tuple[str, ...]] = ("BMP",  "bmp", "Bitmap")
@@ -30,8 +30,6 @@ class MyMappedEnum(MappedEnum):
 
 Copyright 2025 Daniel Robert Jackson
 """
-
-# TODO: Clean up imports once this module is done.
 
 """
 Standard Libraries
@@ -55,7 +53,6 @@ from .enum_utils import (
     make_string_to_enum_dict,
     make_enum_and_str_rep_dicts,
 )
-from drjutils.common.types.sentinel import UNSET
 
 __all__ = [
     "MappedEnum"
@@ -86,7 +83,7 @@ class MappedEnum(Enum):
 
     ```python
     from typing import Final, Tuple
-    from drjutils.common import MappedEnum
+    from drjutils.common.types.enums import MappedEnum
 
     class MyMappedEnum(MappedEnum):
         BMP:  Final[Tuple[str, ...]] = ("BMP",  "bmp", "Bitmap")
@@ -158,19 +155,14 @@ class MappedEnum(Enum):
     @classmethod
     def __init_subclass__(cls) -> None:
         """
-        This method is called when a subclass of BooleanAlias is created.
+        Initialize mapping dictionaries for a new ``MappedEnum`` subclass.
 
-        It ensures that the subclass has defined the required class variables
-        and initializes the sets for fast lookup of True and False values.
-        It also builds a combined mapping of all valid string values to their
-        corresponding boolean values.
+        This builds ``_ENUMS_TO_STRINGS`` and ``_STRINGS_TO_ENUMS`` so that
+        lookups between enum members and their string representations are fast
+        and reliable.
 
         Args:
             cls: The subclass that is being initialized.
-
-        Raises:
-            ValueError: If multiple True or False members are found in the subclass.
-            AssertionError: If the subclass does not define the required class variables.
         """
         super().__init_subclass__()
 
@@ -198,33 +190,30 @@ class MappedEnum(Enum):
     @classmethod
     def maybe_from_str(cls, string: str) -> Optional[Self]:
         """
-        Attempts to convert a string to a BooleanAlias instance if it matches known boolean representations.
+        Attempt to convert ``string`` to a member of ``cls``.
 
         Args:
-            string (str): The input string to interpret as a boolean value.
+            string: The string to interpret as an enum member.
 
         Returns:
-            Optional[BooleanAlias]: Returns BooleanAlias.TRUE or BooleanAlias.FALSE if the string matches a known boolean alias,
-            otherwise returns None.
+            The matching enum member if ``string`` is recognized, otherwise
+            ``None``.
         """
         return cls._STRINGS_TO_ENUMS.get(string)
 
     @classmethod
     def from_str(cls, string: str) -> Self:
         """
-        Converts a string to a BooleanAlias instance.
-
-        Attempts to interpret the given string as a boolean value. If the string cannot be
-        interpreted as a boolean, raises a ValueError.
+        Convert ``string`` to a member of ``cls``.
 
         Args:
-            string (str): The string to convert to a BooleanAlias instance.
+            string: The string to convert.
 
         Returns:
-            BooleanAlias: The BooleanAlias instance corresponding to the input string.
+            The matching enum member.
 
         Raises:
-            ValueError: If the input string cannot be interpreted as a boolean.
+            ValueError: If ``string`` is not a valid representation.
         """
         result = cls.maybe_from_str(string)
         if result is None:
