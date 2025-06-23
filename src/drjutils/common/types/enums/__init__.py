@@ -43,10 +43,13 @@ from .enum_utils import (
     make_enum_and_str_rep_dicts,
     )
 from .mapped_enum  import MappedEnum
+from .enum_regex  import EnumRegex
 
 
 __all__ = [
     # Classes
+    "MappedEnum",
+    "EnumRegex",
     # Data Types
     "EnumType",
     "StrReps",
