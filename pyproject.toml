@@ -1,5 +1,5 @@
 [project]
-    name            = "drj-utils"
+    name            = "drjutils"
     version         = "0.1.0"
     description     = "Common utilities shared across my projects"
     authors         = [{ name = "Daniel Jackson", email = "643707+danielrjackson@users.noreply.github.com" }]
