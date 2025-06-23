@@ -36,7 +36,8 @@ Local Libraries
 """
 # Configuration loader
 from ..configurator.loader  import ConfigLoader
-from .                      import Files
+from ..configurator.utils   import find_config_file
+from .                      import API_KEYS_FILE
 # Logging
 from ..logger               import debug, info, warning, error
 
@@ -208,7 +209,7 @@ def get_package_config_path() -> Path:
     Returns:
         Path to the template configuration file
     """
-    return Path(__file__).parent / "api_keys.yaml"
+    return API_KEYS_FILE
 
 
 def get_user_config_path() -> Path:
@@ -233,7 +234,6 @@ def find_api_keys_config() -> Optional[str]:
     Returns:
         Path to the configuration file, or None if not found
     """
-    from .utils import find_config_file
     
     # First, check the project directory and parent directories
     config_path = find_config_file("api_keys.yaml")
