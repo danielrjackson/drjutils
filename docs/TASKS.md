@@ -35,7 +35,7 @@ TODO: Add summaries to the files to give better context.
 - [x] **Fix automation setup script**: end with a newline and ensure commands are correct.
 - [x] **Fix `MappedEnum.__new__`**: allow enum members defined with tuples to be created correctly.
 - [x] **Repair configuration path helpers**: avoid shadowing `Path` from `pathlib` and build file paths correctly.
-- **Clean up `MappedEnum` imports** once the class is finalized.
+- [x] **Clean up `MappedEnum` imports** once the class is finalized.
   - Look for any bugs in this class.
 - **Finish `collections` classes**
 - **Rename `boolean_alias` to `boolean_enum_base`**

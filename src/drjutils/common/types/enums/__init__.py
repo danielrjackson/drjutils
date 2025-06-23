@@ -47,6 +47,7 @@ from .mapped_enum  import MappedEnum
 
 __all__ = [
     # Classes
+    "MappedEnum",
     # Data Types
     "EnumType",
     "StrReps",
