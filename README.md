@@ -1,6 +1,6 @@
-# DRJ Utils
+# drjutils
 
-A collection of utility modules for Python projects.
+A collection of utility modules for my Python projects.
 
 ## Overview
 
