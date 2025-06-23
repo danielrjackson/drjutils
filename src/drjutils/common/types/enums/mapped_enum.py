@@ -123,9 +123,7 @@ class MappedEnum(Enum):
             ValueError: If the value is empty or does not contain valid strings.
         """
         reps = value
-        assert_str_reps_valid(reps, Self)
-
-        assert_str_reps_valid(reps, Self)
+        assert_str_reps_valid(reps, cls)
 
         obj = object.__new__(cls)
 
