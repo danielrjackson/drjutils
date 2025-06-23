@@ -1,13 +1,4 @@
-"""
-Utilities Config Module
-
-This module contains general configuration useful in most projects.
-
-Classes:
-    ApiKeys: Represents an API key configuration
-
-Copyright 2025 Daniel Robert Jackson
-"""
+"""Utilities for locating configuration files."""
 
 """
 Standard Libraries
@@ -21,24 +12,14 @@ Local Libraries
 # API keys configuration
 from .api_keys import ApiKeys
 
-__all__ = ['ApiKeys']
+CONFIG_DIR: Path = Path(__file__).parent
+"""Location of the configuration directory."""
 
-class Path:
-    """
-    Path for configuration folder.
+API_KEYS_FILE: Path = CONFIG_DIR / "api_keys.yaml"
+"""Path to the default ``api_keys.yaml`` configuration file bundled with the package."""
 
-    Attributes:
-        root: Path to the configuration folder
-    """
-    def __init__(self):
-        self.root = Path(__file__).parent
-
-class Files:
-    """
-    Paths for configuration files.
-
-    Attributes:
-        api_keys: Path to the API keys configuration file
-    """
-    def __init__(self):
-        self.api_keys = Path.join(Path.root, "api_keys.yaml")
+__all__ = [
+    "ApiKeys",
+    "CONFIG_DIR",
+    "API_KEYS_FILE",
+]
