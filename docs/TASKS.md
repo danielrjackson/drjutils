@@ -41,7 +41,7 @@ TODO: Add summaries to the files to give better context.
 - **Rename `boolean_alias` to `boolean_enum_base`**
 - **Move methods in `types` to appropriate classes**: delete duplicates if the method already exists in the target class.
   - Worry about fixing them after all of the organization work is complete.
-- **Remove or implement `foo()`** in `d_words.py`.
+- [x] **Remove or implement `foo()`** in `d_words.py`.
 - **Create `EnumRegex` base class**: similar to `MappedEnum` but using regex patterns tied to enum members.
 - **Add `active` vs `past_tense` switch to `EnabledDisabled` class**: A flag is need to change the default verbage for the `EnabledDisabled` class. Once set, should affect all instances of the class.
 - **Update tests path to match src folder structure**

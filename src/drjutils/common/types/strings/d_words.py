@@ -403,10 +403,3 @@ def to_case(value: str, case: StrCase) -> str:
         case _:
             raise ValueError(f"Unimplemented case: {case}")
 
-def foo():
-    """
-    Placeholder function for future implementation.
-    """
-    
-    
-    pass
